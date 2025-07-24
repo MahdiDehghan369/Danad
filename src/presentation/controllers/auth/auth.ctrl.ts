@@ -1,7 +1,10 @@
 import { RegisterUser } from "../../../application/usecases/auth/registerUser";
 import { LoginUserWithEmail } from "../../../application/usecases/auth/loginUser";
+import { LogoutUser } from "../../../application/usecases/auth/logoutUser";
 import { userRepository } from "../../../infrastructure/db/mongodb/repositories/userRepository";
+import { RefreshTokenRepository } from "../../../infrastructure/db/mongodb/repositories/refreshTokenRepository";
 import { Request, Response, NextFunction } from "express";
+import { AppError } from "../../../utils/appError";
 
 export const registerUser = async (
   req: Request,
@@ -14,8 +17,6 @@ export const registerUser = async (
     const existsUsername = await userRepo.findByUsername(req.body?.username);
     const existsEmail = await userRepo.findByEmail(req.body?.email);
     const existsPhone = await userRepo.findByPhone(req.body?.phone);
-
-    
 
     const registerUsercase = new RegisterUser(userRepo);
 
@@ -62,3 +63,29 @@ export const loginUserWithEmail = async (
   }
 };
 
+export const logoutUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const repo = new RefreshTokenRepository();
+
+    const logoutUser = new LogoutUser(repo);
+
+    const refreshToken = req.cookies?.RefreshToken;
+
+    if (!refreshToken) throw new AppError("No refresh token provided", 400);
+
+    const result = await logoutUser.execute({ refreshToken });
+
+      res.clearCookie("RefreshToken");
+
+    return res.status(200).json({
+      success: true,
+      message: "Logout successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};

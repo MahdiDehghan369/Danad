@@ -11,6 +11,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     async findByToken(token: string): Promise<RefreshToken | null> {
         const refreshToken = await refreshTokenModel.findOne({token})
 
+
         if(!refreshToken) return null
 
         return new RefreshToken(
