@@ -1,3 +1,5 @@
+import bcrypt from "bcrypt"
+
 export class User {
   constructor(
     public _id: string,
@@ -44,6 +46,10 @@ export class User {
 
   getPassword(): string {
     return this.password;
+  }
+
+  async comparePassword(hashedPassword: string): Promise<boolean>{
+     return await bcrypt.compare(hashedPassword, this.password);
   }
 
   withoutPassword() {
