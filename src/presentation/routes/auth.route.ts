@@ -9,7 +9,7 @@ import {
   logoutUser,
   refreshToken,
   getMe
-} from "../controllers/auth/auth.ctrl";
+} from "../controllers/auth.ctrl";
 
 router.route("/register").post(registerUser)
 router.route("/login/email").post(loginUserWithEmail);

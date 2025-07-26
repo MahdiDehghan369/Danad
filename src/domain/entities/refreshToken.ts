@@ -1,6 +1,6 @@
 export class RefreshToken {
   constructor(
-    public _id: string,
+    public readonly _id: string,
     public token: string,
     public user: string,
     public ip: string,

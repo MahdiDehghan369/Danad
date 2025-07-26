@@ -2,7 +2,7 @@ import bcrypt from "bcrypt"
 
 export class User {
   constructor(
-    public _id: string,
+    public readonly _id: string,
     public email: string,
     public phone: string,
     public username: string,

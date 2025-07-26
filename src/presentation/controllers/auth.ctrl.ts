@@ -1,17 +1,13 @@
-import { User } from "../../../domain/entities/user";
-import { RegisterUser } from "../../../application/usecases/auth/registerUser";
-import { LoginUserWithEmail } from "../../../application/usecases/auth/loginUser";
-import { RefreshToken } from "../../../application/usecases/auth/refreshToken";
-import { LogoutUser } from "../../../application/usecases/auth/logoutUser";
-import { GetMe } from "../../../application/usecases/auth/getMe";
-import { userRepository } from "../../../infrastructure/db/mongodb/repositories/userRepository";
-import { RefreshTokenRepository } from "../../../infrastructure/db/mongodb/repositories/refreshTokenRepository";
+import { ICustomRequest } from "../../application/interfaces/ICustomReq";
+import { RegisterUser } from "../../application/usecases/auth/registerUser";
+import { LoginUserWithEmail } from "../../application/usecases/auth/loginUser";
+import { RefreshToken } from "../../application/usecases/auth/refreshToken";
+import { LogoutUser } from "../../application/usecases/auth/logoutUser";
+import { GetMe } from "../../application/usecases/auth/getMe";
+import { userRepository } from "../../infrastructure/db/mongodb/repositories/userRepository";
+import { RefreshTokenRepository } from "../../infrastructure/db/mongodb/repositories/refreshTokenRepository";
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../../../utils/appError";
-
-interface CustomRequest extends Request {
-  user?: User;
-}
+import { AppError } from "../../utils/appError";
 
 export const registerUser = async (
   req: Request,
@@ -129,7 +125,11 @@ export const refreshToken = async (req: Request , res: Response , next: NextFunc
   }
 }
 
-export const getMe = async (req: CustomRequest, res: Response, next: NextFunction) => {
+export const getMe = async (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const userRepo = new userRepository();
     const getMeUseCase = new GetMe(userRepo);
@@ -140,11 +140,10 @@ export const getMe = async (req: CustomRequest, res: Response, next: NextFunctio
 
     return res.status(200).json({
       success: true,
-      data : {
-        user: data?.user
-      }
-    })
-
+      data: {
+        user: data?.user,
+      },
+    });
   } catch (error) {
     next(error);
   }

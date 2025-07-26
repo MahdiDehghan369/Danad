@@ -2,20 +2,17 @@ import {Request , Response , NextFunction} from "express"
 import { userRepository } from "../../infrastructure/db/mongodb/repositories/userRepository"
 import { verifyAccessToken } from "../../utils/jwt"
 import { AppError } from "../../utils/appError"
-import { User } from "../../domain/entities/user"
-
+import { ICustomRequest } from "../../application/interfaces/ICustomReq"
 
 
 interface JWTPyload {
     _id: string
 }
 
-interface CustomRequest extends Request {
-  user?: User;
-}
+
 
 export const authMiddleware = async (
-  req: CustomRequest,
+  req: ICustomRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -44,6 +41,6 @@ export const authMiddleware = async (
     req.user = user.withoutPassword();
     next();
   } catch (error) {
-    throw new AppError("Token invalid", 422);
+    throw new AppError("Token invalid or expired", 422);
   }
 };
