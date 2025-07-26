@@ -1,5 +1,6 @@
 import { ICategoryRepository } from "../../../../application/interfaces/ICategoryRepository";
 import { Category } from "../../../../domain/entities/category";
+import { buildCategoryTree } from "../../../../utils/buildCategoryTree";
 import { categoryModel } from "../models/category.model";
 
 interface GetCategoryOptions {
@@ -7,6 +8,7 @@ interface GetCategoryOptions {
   parent?: string | null;
   page?: number;
   limit?: number;
+  isActive?: boolean
 }
 
 interface ICreateCategory {
@@ -84,17 +86,21 @@ export class CategoryRepository implements ICategoryRepository {
   }
 
   async getCategories(options: GetCategoryOptions): Promise<{
-    data: Category[];
+    data: any[];
     total: number;
     page: number;
     limit: number;
   }> {
-    const { type, parent, page = 1, limit = 10 } = options;
+    const { type, parent, page = 1, limit = 10, isActive } = options;
 
     const filters: any = {};
     if (type) filters.type = type;
     if (parent !== undefined) {
       filters.parent = parent === null ? null : parent;
+    }
+
+    if (typeof isActive === "boolean") {
+      filters.isActive = isActive;
     }
 
     const skip = (page - 1) * limit;
@@ -104,7 +110,7 @@ export class CategoryRepository implements ICategoryRepository {
       categoryModel.countDocuments(filters),
     ]);
 
-    const data = categories.map(
+    const mapped = categories.map(
       (cat) =>
         new Category(
           cat._id.toString(),
@@ -119,7 +125,11 @@ export class CategoryRepository implements ICategoryRepository {
         )
     );
 
-    return { data, total, page, limit };
+
+
+    const tree = buildCategoryTree(mapped);
+
+    return { data: tree, total, page, limit };
   }
 
   async findByIdAndDelete(categoryId: string): Promise<boolean> {
@@ -149,15 +159,36 @@ export class CategoryRepository implements ICategoryRepository {
   }
 
   async deleteCategoryCascade(categoryId: string): Promise<void> {
-    await categoryModel.deleteMany({ parent: categoryId }); 
-    await categoryModel.findByIdAndDelete(categoryId); 
+    await categoryModel.deleteMany({ parent: categoryId });
+    await categoryModel.findByIdAndDelete(categoryId);
   }
 
   async deleteCategoryDetach(categoryId: string): Promise<void> {
     await categoryModel.updateMany(
       { parent: categoryId },
       { $set: { parent: null } }
-    ); 
-    await categoryModel.findByIdAndDelete(categoryId); 
+    );
+    await categoryModel.findByIdAndDelete(categoryId);
+  }
+
+  async findBySlugAndType(
+    slug: string,
+    type: "blog" | "course"
+  ): Promise<Category | null> {
+    const category = await categoryModel.findOne({ slug, type }, "-__v").lean();
+
+    if (!category) return null;
+
+    return new Category(
+      category._id.toString(),
+      category.title,
+      category.slug,
+      category.description,
+      category.type,
+      category.parent?.toString() || null,
+      category.isActive,
+      category.createdAt,
+      category.updatedAt
+    );
   }
 }

@@ -10,4 +10,9 @@ export class Category {
     public readonly createdAt: Date,
     public readonly updatedAt: Date
   ) {}
+
+
+  isCategoryActive(){
+    return this.isActive
+  }
 }

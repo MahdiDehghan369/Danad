@@ -18,8 +18,12 @@ export class createCategory {
 
     async execute(data: ICreateCategory){
         data.slug = slugify(data.slug)
+        data.type = data.type.trim().toLowerCase() as "blog" | "course"
 
-        const existsSlug = await this.categoryRepo.findBySlug(data.slug)
+        const existsSlug = await this.categoryRepo.findBySlugAndType(
+          data.slug,
+          data.type
+        );
 
         if(existsSlug){
             throw new AppError("We have already category with this slug" , 409)

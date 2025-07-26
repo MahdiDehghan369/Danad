@@ -29,4 +29,5 @@ export interface ICategoryRepository {
   findBySlug(slug: string): Promise<Category | null>;
   deleteCategoryCascade(categoryId: string): Promise<void>;
   deleteCategoryDetach(categoryId: string): Promise<void>;
+  findBySlugAndType(slug: string , type: "blog" | "course"): Promise<Category | null>;
 } 
