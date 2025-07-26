@@ -1,10 +1,17 @@
+import { User } from "../../../domain/entities/user";
 import { RegisterUser } from "../../../application/usecases/auth/registerUser";
 import { LoginUserWithEmail } from "../../../application/usecases/auth/loginUser";
+import { RefreshToken } from "../../../application/usecases/auth/refreshToken";
 import { LogoutUser } from "../../../application/usecases/auth/logoutUser";
+import { GetMe } from "../../../application/usecases/auth/getMe";
 import { userRepository } from "../../../infrastructure/db/mongodb/repositories/userRepository";
 import { RefreshTokenRepository } from "../../../infrastructure/db/mongodb/repositories/refreshTokenRepository";
 import { Request, Response, NextFunction } from "express";
 import { AppError } from "../../../utils/appError";
+
+interface CustomRequest extends Request {
+  user?: User;
+}
 
 export const registerUser = async (
   req: Request,
@@ -85,6 +92,59 @@ export const logoutUser = async (
       success: true,
       message: "Logout successfully",
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const refreshToken = async (req: Request , res: Response , next: NextFunction) => {
+  try {
+
+    const token = req.cookies?.RefreshToken;
+
+    if (!token) {
+      return res.status(401).json({ message: "Refresh token not provided" });
+    }
+
+    const repo = new RefreshTokenRepository()
+
+    const refreshTokenUseCase = new RefreshToken(repo);
+
+
+    const data = await refreshTokenUseCase.execute({ refreshToken: token });
+
+    res.cookie("RefreshToken", data.refreshToken, {
+      httpOnly: true,
+      maxAge: 1296000000,
+    });
+
+    return res.status(200).json({
+      success: true,
+      accessToken: data.accessToken,
+      message: "Tokens refreshed successfully",
+    });
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getMe = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const userRepo = new userRepository();
+    const getMeUseCase = new GetMe(userRepo);
+
+    const userId = req.user?._id;
+
+    const data = await getMeUseCase.exeute(userId as string);
+
+    return res.status(200).json({
+      success: true,
+      data : {
+        user: data?.user
+      }
+    })
+
   } catch (error) {
     next(error);
   }

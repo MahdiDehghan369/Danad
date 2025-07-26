@@ -5,4 +5,5 @@ export interface IRefreshTokenRepository {
   findByUserId(userId: string): Promise<RefreshToken | null>;
   findByToken(token: string): Promise<RefreshToken | null>;
   remove(token: string): Promise<boolean>;
+  updateOne(token: string, newToken: string , expireIn: Date): Promise<boolean>;
 }

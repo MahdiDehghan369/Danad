@@ -26,12 +26,15 @@ export class RegisterUser {
       throw new AppError("Phone already exists", 409);
     }
 
+    const role = await this.userRepo.getCountDocuments() > 0 ? "USER" : "ADMIN"
+
     const user = new User(
       data.fullname,
       data.email,
       data.phone,
       data.username,
-      data.password
+      data.password,
+      role
     );
 
     return await this.userRepo.save(user);

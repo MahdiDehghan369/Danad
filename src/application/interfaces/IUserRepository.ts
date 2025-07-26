@@ -5,5 +5,6 @@ export interface IUserRepository {
     findByEmail(email: string): Promise<User | null>;
     findByUsername(username: string): Promise<User | null>;
     findByPhone(phone: string): Promise<User | null>;
-    findById(id: string): Promise<User | null>
+    findById(id: string): Promise<User | null>;
+    getCountDocuments(): Promise<number>
 }

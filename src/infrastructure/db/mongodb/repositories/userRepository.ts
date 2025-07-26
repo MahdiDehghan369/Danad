@@ -95,4 +95,8 @@ export class userRepository implements IUserRepository {
       data.fullname
     );
   }
+
+  async getCountDocuments(): Promise<number> {
+    return await userModel.find({}).countDocuments()
+  }
 }
