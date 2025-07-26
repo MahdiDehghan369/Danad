@@ -29,7 +29,6 @@ export class CategoryRepository implements ICategoryRepository {
       isActive: data.isActive ?? true,
     });
 
-
     return new Category(
       created._id as string,
       created.title,
@@ -147,5 +146,18 @@ export class CategoryRepository implements ICategoryRepository {
       category.createdAt,
       category.updatedAt
     );
+  }
+
+  async deleteCategoryCascade(categoryId: string): Promise<void> {
+    await categoryModel.deleteMany({ parent: categoryId }); 
+    await categoryModel.findByIdAndDelete(categoryId); 
+  }
+
+  async deleteCategoryDetach(categoryId: string): Promise<void> {
+    await categoryModel.updateMany(
+      { parent: categoryId },
+      { $set: { parent: null } }
+    ); 
+    await categoryModel.findByIdAndDelete(categoryId); 
   }
 }

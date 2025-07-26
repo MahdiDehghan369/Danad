@@ -27,4 +27,6 @@ export interface ICategoryRepository {
   }>;
   findByIdAndDelete(categoryId: string): Promise<boolean>;
   findBySlug(slug: string): Promise<Category | null>;
+  deleteCategoryCascade(categoryId: string): Promise<void>;
+  deleteCategoryDetach(categoryId: string): Promise<void>;
 } 
