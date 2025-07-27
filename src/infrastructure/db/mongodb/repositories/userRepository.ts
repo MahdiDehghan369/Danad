@@ -122,6 +122,14 @@ export class userRepository implements IUserRepository {
       user.avatar,
       user.fullname
     ).withoutPassword();
+  }
 
+
+  async findByIdAndDelete(userId: string): Promise<true | null> {
+    const user = await userModel.findByIdAndDelete(userId)
+
+    if(!user) return null
+
+    return true
   }
 }

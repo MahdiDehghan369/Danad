@@ -12,4 +12,5 @@ export interface IUserRepository {
     userId: string,
     data: object
   ): Promise<User | null>;
+  findByIdAndDelete(userId: string): Promise<true | null>
 }
