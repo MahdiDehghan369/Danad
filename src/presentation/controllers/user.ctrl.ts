@@ -4,6 +4,13 @@ import { updateUser } from "../../application/usecases/user/updateUser";
 import { ICustomRequest } from "../../application/interfaces/ICustomReq";
 import { removeUserByAdmin } from "../../application/usecases/user/removeUser";
 import { getUserInformation } from "../../application/usecases/user/getUserInfo";
+import { getAllUsers } from "../../application/usecases/user/getAllUsers";
+
+interface GetUserOptions {
+  isBlocked?: string;
+  page?: number;
+  limit?: number;
+}
 
 
 export const updateUserInfo = async(req: ICustomRequest , res: Response , next: NextFunction) => {
@@ -65,6 +72,37 @@ export const getUserInfo = async (req:Request , res: Response , next: NextFuncti
                 user: data.user
             }
         })
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getUsers = async(req: Request , res: Response , next: NextFunction) => {
+    try {
+        const userRepo = new userRepository()
+        const getAllUsersUseCase = new getAllUsers(userRepo)
+
+        const option: GetUserOptions = req.query
+
+        const data = await getAllUsersUseCase.execute(option);
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                users : data.data,
+                limit : data.limit,
+                page : data.page,
+                total : data.total,
+            }
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const banUser = async(req: Request , res: Response , next: NextFunction) => {
+    try {
         
     } catch (error) {
         next(error)

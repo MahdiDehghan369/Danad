@@ -8,7 +8,7 @@ interface GetCategoryOptions {
   parent?: string | null;
   page?: number;
   limit?: number;
-  isActive?: boolean
+  isActive?: string
 }
 
 interface ICreateCategory {
@@ -99,9 +99,9 @@ export class CategoryRepository implements ICategoryRepository {
       filters.parent = parent === null ? null : parent;
     }
 
-    if (typeof isActive === "boolean") {
-      filters.isActive = isActive;
-    }
+        if (isActive === "true" || isActive === "false") {
+          filters.isActive = isActive;
+        }
 
     const skip = (page - 1) * limit;
 

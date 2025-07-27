@@ -3,6 +3,12 @@ import { User } from "../../../../domain/entities/user";
 import { validateObjectId } from "../../../../validators/validateObjetId";
 import { userModel } from "../models/user.model";
 
+interface GetUserOptions {
+  isBlocked?: string;
+  page?: number;
+  limit?: number;
+}
+
 
 export class userRepository implements IUserRepository {
   async save(user: User): Promise<User> {
@@ -99,16 +105,15 @@ export class userRepository implements IUserRepository {
   }
 
   async getCountDocuments(): Promise<number> {
-    return await userModel.find({}).countDocuments()
+    return await userModel.find({}).countDocuments();
   }
 
   async findByIdAndUpdate(userId: string, data: object): Promise<User | null> {
-    
-    const user = await userModel.findByIdAndUpdate(userId , data , {
-      new: true
-    }) 
+    const user = await userModel.findByIdAndUpdate(userId, data, {
+      new: true,
+    });
 
-    if(!user) return null
+    if (!user) return null;
 
     return new User(
       user._id.toString(),
@@ -124,12 +129,53 @@ export class userRepository implements IUserRepository {
     ).withoutPassword();
   }
 
-
   async findByIdAndDelete(userId: string): Promise<true | null> {
-    const user = await userModel.findByIdAndDelete(userId)
+    const user = await userModel.findByIdAndDelete(userId);
 
-    if(!user) return null
+    if (!user) return null;
 
-    return true
+    return true;
+  }
+
+  async findAllUsers(options: GetUserOptions): Promise<{
+    data: any[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+     const {isBlocked ,page = 1, limit = 10 } = options;
+        isBlocked?.trim().toLowerCase()
+        const filters: any = {};
+    
+        if (isBlocked === "true" || isBlocked === "false") {
+          filters.isBlocked = isBlocked;
+        }
+    
+        const skip = (page - 1) * limit;
+    
+        const [users, total] = await Promise.all([
+          userModel.find(filters, "-__v").skip(skip).limit(limit).lean(),
+          userModel.countDocuments(filters),
+        ]);
+    
+        const mapped = users.map(
+          (user) =>
+            new User(
+              user._id.toString(),
+              user.email,
+              user.phone,
+              user.username,
+              user.password,
+              user.role,
+              user.isVerified,
+              user.isBlocked,
+              user.avatar,
+              user.fullname,
+              user.createdAt ?? undefined,
+              user.updatedAt ?? undefined
+            )
+        );
+
+         return { data: mapped, total, page, limit };
   }
 }
