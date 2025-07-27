@@ -6,6 +6,7 @@ import { errorHandler } from "./presentation/middlewares/errorHandler";
 
 import authRouter from "./presentation/routes/auth.route";
 import categoryRouter from "./presentation/routes/category.route";
+import userRouter from "./presentation/routes/user.route";
 
 app.use(express.json())
 app.use(cookieParser())
@@ -19,6 +20,7 @@ app.use(
 
 app.use("/auth" , authRouter)
 app.use("/categories", categoryRouter);
+app.use("/users", userRouter);
 
 app.use(errorHandler)
 

@@ -1,6 +1,8 @@
 import { IUserRepository } from "../../../../application/interfaces/IUserRepository";
 import { User } from "../../../../domain/entities/user";
+import { validateObjectId } from "../../../../validators/validateObjetId";
 import { userModel } from "../models/user.model";
+
 
 export class userRepository implements IUserRepository {
   async save(user: User): Promise<User> {
@@ -98,5 +100,28 @@ export class userRepository implements IUserRepository {
 
   async getCountDocuments(): Promise<number> {
     return await userModel.find({}).countDocuments()
+  }
+
+  async findByIdAndUpdate(userId: string, data: object): Promise<User | null> {
+    
+    const user = await userModel.findByIdAndUpdate(userId , data , {
+      new: true
+    }) 
+
+    if(!user) return null
+
+    return new User(
+      user._id.toString(),
+      user.email,
+      user.phone,
+      user.username,
+      user.password,
+      user.role,
+      user.isVerified,
+      user.isBlocked,
+      user.avatar,
+      user.fullname
+    ).withoutPassword();
+
   }
 }
