@@ -10,6 +10,8 @@ import {
   fetchBannedUsers,
   uploadProfile,
   removeProfile,
+  assignRoleUser,
+  changePassword,
 } from "../controllers/user.ctrl";
 import { isAdminMiddleware } from "../middlewares/isAdmin";
 
@@ -25,6 +27,9 @@ router.route("/edit").put(authMiddleware , updateUserInfo)
 router.route("/ban").post(authMiddleware, isAdminMiddleware, banUser).get(authMiddleware , isAdminMiddleware , fetchBannedUsers);
 router.route("/unban").delete(authMiddleware, isAdminMiddleware, unbanUser);
 router.route("/:userId").delete(authMiddleware , isAdminMiddleware , removeUser).get(authMiddleware , isAdminMiddleware , getUserInfo)
+router
+  .route("/:userId/roles")
+  .patch(authMiddleware, isAdminMiddleware, assignRoleUser);
 
-
+router.route("/change-password").patch(authMiddleware , changePassword)
 export default router

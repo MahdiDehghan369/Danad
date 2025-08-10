@@ -11,6 +11,8 @@ import { unbanUserUseCase } from "../../application/usecases/user/unbanUser";
 import { getAllBannedUsers } from "../../application/usecases/user/getAllBannedUsers";
 import { uploadUserProfile } from "../../application/usecases/user/uploadUserProfile";
 import { removeUserProfile } from "../../application/usecases/user/removeUserProfile";
+import { assignRoleToUser } from "../../application/usecases/user/assignRoleToUser";
+import { changeUserPassword } from "../../application/usecases/user/changeUserPassword";
 import { AppError } from "../../utils/appError";
 
 interface GetUserOptions {
@@ -231,6 +233,48 @@ export const removeProfile = async (req: ICustomRequest , res: Response , next: 
     return res.status(200).json({
       success: true,
       message: "Profile removed successfully"
+    })
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const assignRoleUser = async(req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const userId = req.params.userId
+    const adminId = req.user?._id
+    const role = req.body.role
+
+    const userRepo = new userRepository()
+    const assignRoleToUserUseCase = new assignRoleToUser(userRepo)
+    const data = await assignRoleToUserUseCase.execute(adminId as string , userId , role)
+
+    return res.status(200).json({
+      success: true,
+      message: "Assign role to user successfully"
+    })
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+export const changePassword = async(req:ICustomRequest, res: Response , next: NextFunction) => {
+  try {
+
+    const userId = req.user?._id as string
+    const {currentPassword , newPassword} = req.body
+
+    const userRepo = new userRepository()
+    const changePasswordUseCase = new changeUserPassword(userRepo)
+    const data = await changePasswordUseCase.execute(userId , currentPassword , newPassword)
+
+    return res.status(200).json({
+      success: true,
+      message: "Password changed successfully"
     })
     
   } catch (error) {
