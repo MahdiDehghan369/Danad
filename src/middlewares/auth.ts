@@ -40,6 +40,7 @@ export const authMiddleware = async (
     user.password = ""
     req.user = user
 
+
     next();
 
   } catch (error) {
