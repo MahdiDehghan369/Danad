@@ -15,7 +15,7 @@ interface IUser extends Document {
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   lastLogin?: Date;
-  loginIPs: string[];
+  comparePassword(password: string): Promise<boolean>;
 }
 
 const userSchema = new Schema<IUser>(
@@ -39,8 +39,6 @@ const userSchema = new Schema<IUser>(
     isEmailVerified: { type: Boolean, default: false },
     isPhoneVerified: { type: Boolean, default: false },
     lastLogin: { type: Date },
-    loginIPs: [{ type: String }],
-
   },
   { timestamps: true }
 );

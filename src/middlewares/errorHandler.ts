@@ -9,6 +9,7 @@ export const errorHandler = (
   res: Response,
   next: NextFunction
 ) => {
+  console.error("❌ Error:", err);
 
   if (err instanceof AppError) {
     return errorResponse(res, err.statusCode, err.message);

@@ -11,9 +11,9 @@ interface IRegisterUser {
 export const authRepo = {
   create: async (date: Partial<IRegisterUser>) => await UserModel.create(date),
   findByEmail: async (email: string) =>
-    await UserModel.findOne({ email }).lean(),
+    await UserModel.findOne({ email }),
   findByPhone: async (phone: string) =>
-    await UserModel.findOne({ phone }).lean(),
+    await UserModel.findOne({ phone }),
   findByUsername : async (username: string) => await UserModel.findOne({username}),
   countuser : async () => await UserModel.countDocuments()
 };
