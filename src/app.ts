@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser"
 const app = express()
 
 import authRouter from "./modules/auth/auth.route"
+import banRouter from "./modules/ban/ban.route"
 
 import {errorHandler} from "./middlewares/errorHandler"
 
@@ -14,6 +15,7 @@ app.use(cookieParser());
 
 
 app.use("/auth" , authRouter)
+app.use("/ban" , banRouter)
 
 
 // set error-handler
