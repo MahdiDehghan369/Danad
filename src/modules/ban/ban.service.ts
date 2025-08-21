@@ -1,7 +1,7 @@
 import { AppError } from "../../utils/appError";
 import { userRepo } from "../user/user.repo";
 import { banUser } from "./ban.ctrl";
-import { banRepo, IBanUserService } from "./ban.repo";
+import { banRepo, IBanUserService, IEditBanData, IGetBanUsersQuery } from "./ban.repo";
 
 export const banUserService = async (data: IBanUserService) => {
   if (data.user == data.bannedBy)
@@ -33,10 +33,9 @@ export const unbanUserService = async (userId: string) => {
 };
 
 export const getBanInfoService = async (userId: string) => {
+  const user = await userRepo.findById(userId);
 
-  const user = await userRepo.findById(userId)
-
-  if(!user) throw new AppError("User not found" , 404)
+  if (!user) throw new AppError("User not found", 404);
 
   const banUserInfo = await banRepo.getBanInfo(userId);
 
@@ -49,4 +48,16 @@ export const getBanInfoService = async (userId: string) => {
     endAt: banUserInfo.endAt,
     createdAt: banUserInfo.createdAt,
   };
+};
+
+export const getBanUsersService = async (query: IGetBanUsersQuery) => {
+  const users = await banRepo.getBanUsers(query);
+  return users;
+};
+
+export const editBanService = async (banId: string, data: IEditBanData) => {
+  const ban = await banRepo.updateOne(banId, data);
+  if (!ban) throw new AppError("Ban not found", 404);
+
+  return ban;
 };

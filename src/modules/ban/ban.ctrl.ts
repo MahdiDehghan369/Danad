@@ -2,7 +2,9 @@ import { NextFunction, Request, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
 import {
   banUserService,
+  editBanService,
   getBanInfoService,
+  getBanUsersService,
   unbanUserService,
 } from "./ban.service";
 import { successResponse } from "../../utils/response";
@@ -63,3 +65,29 @@ export const getBanInfo = async (
     next(error);
   }
 };
+
+export const getBanUsers = async (req: Request , res: Response , next: NextFunction) => {
+  try {
+
+    const result = await getBanUsersService(req.query)
+
+    return successResponse(res, 200 , "Fetch ban users successfully :)" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const editBan = async (req: Request , res: Response , next: NextFunction) => {
+  try {
+
+    const {banId} = req.params
+
+    const result = await editBanService(banId , req.body)
+
+    return successResponse(res, 200 , "Updated successfully :)" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}
