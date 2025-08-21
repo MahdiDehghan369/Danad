@@ -3,7 +3,7 @@ import bcrypt from "bcrypt"
 
 export type UserRole = "student" | "teacher" | "admin"
 
-interface IUser extends Document {
+export interface IUser extends Document {
   fullname: string;
   username: string;
   email: string;

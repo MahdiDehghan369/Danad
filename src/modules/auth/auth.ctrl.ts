@@ -7,6 +7,8 @@ import {
 } from "./auth.service";
 import { successResponse } from "../../utils/response";
 import { env } from "../../config/env";
+import { ICustomRequest } from "../../middlewares/auth";
+import { AppError } from "../../utils/appError";
 
 export const register = async (
   req: Request,
@@ -94,8 +96,14 @@ export const logout = async (
   }
 };
 
-export const getMe = async (req: Request , res: Response , next: NextFunction) => {
+export const getMe = async (req: ICustomRequest , res: Response , next: NextFunction) => {
   try {
+
+    const user = req?.user
+
+    if(!user) throw new AppError("User not authenticated" , 401);
+
+    return successResponse(res, 200 , "Get user's info successfully :)" , user)
     
   } catch (error) {
     next(error)
