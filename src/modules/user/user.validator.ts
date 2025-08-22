@@ -36,6 +36,13 @@ export const userIdValidator = yup.object().shape({
     .matches(/^[0-9a-fA-F]{24}$/, "Invalid user ID format"),
 });
 
+export const accountIdValidator = yup.object().shape({
+  accountId: yup
+    .string()
+    .required("Account ID is required")
+    .matches(/^[0-9a-fA-F]{24}$/, "Invalid account ID format"),
+});
+
 export const userRoleValidator = yup.object().shape({
   role: yup
     .string()

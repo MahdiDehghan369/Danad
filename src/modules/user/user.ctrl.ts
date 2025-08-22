@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { changePasswordService, changeUserRoleService, editUserInfoService, getUserInfoService, getUsersService, removeProfileService, removeUserService, setProfileService } from "./user.service";
+import { changePasswordService, changeUserRoleService, editUserInfoService, getActiveAccountsService, getUserInfoService, getUsersService, removeAccountService, removeAllAccountsService, removeProfileService, removeUserService, setProfileService } from "./user.service";
 import { successResponse } from "../../utils/response";
 import { AppError } from "../../utils/appError";
 import { IGetUsersQuery } from "./user.repo";
@@ -120,6 +120,55 @@ export const removeProfile = async (req: ICustomRequest , res: Response , next :
         await removeProfileService(userId as string)
 
         return successResponse(res, 200 , "Profile removed successfully")
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getActiveAccounts = async (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user?._id;
+
+    const result = await getActiveAccountsService(userId as string)
+
+    return successResponse(res, 200, "Get active acounts successfully" , result)
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeAcount = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+    try {
+
+        const userId = req.user?._id
+        const {accountId} = req.params
+
+        const result = await removeAccountService(userId as string , accountId)
+
+        return successResponse(res, 200 , "Acount deleted successfully :)")
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const removeAllAccounts = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+    try {
+
+        const userId = req.user?._id
+
+        await removeAllAccountsService(userId as string)
+
+        return successResponse(
+          res,
+          200,
+          "All active accounts removed successfully :)"
+        );
         
     } catch (error) {
         next(error)

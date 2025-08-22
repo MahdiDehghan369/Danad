@@ -1,14 +1,33 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
-import { changePassword, changeUserRole, editUserInfo, getUserInfo, getUsers, removeProfile, removeUser, setProfile } from "./user.ctrl";
+import {
+  changePassword,
+  changeUserRole,
+  editUserInfo,
+  getActiveAccounts,
+  getUserInfo,
+  getUsers,
+  removeAcount,
+  removeAllAccounts,
+  removeProfile,
+  removeUser,
+  setProfile,
+} from "./user.ctrl";
 import { bodyValidator } from "../../middlewares/bodyValidator";
-import { changePasswordValidator, editUserInfoValidator, getUsersQueryValidator, userIdValidator, userRoleValidator } from "./user.validator";
+import {
+  accountIdValidator,
+  changePasswordValidator,
+  editUserInfoValidator,
+  getUsersQueryValidator,
+  userIdValidator,
+  userRoleValidator,
+} from "./user.validator";
 import { checkRole } from "../../middlewares/checkRole";
 import { paramValidator } from "../../middlewares/paramValidator";
 import { queryValidator } from "../../middlewares/queryValidator";
 import uploadPhoto from "../../middlewares/multer";
 
-const router = Router()
+const router = Router();
 
 router
   .route("/change-password")
@@ -28,11 +47,15 @@ router
     getUsers
   );
 
-  router
-    .route("/profile")
-    .post(authMiddleware, uploadPhoto.single("profile"), setProfile)
-    .delete(authMiddleware, removeProfile);
+router
+  .route("/profile")
+  .post(authMiddleware, uploadPhoto.single("profile"), setProfile)
+  .delete(authMiddleware, removeProfile);
 
+router.route("/accounts").get(authMiddleware, getActiveAccounts).delete(authMiddleware , removeAllAccounts)
+router
+  .route("/accounts/:accountId")
+  .delete(authMiddleware, paramValidator(accountIdValidator), removeAcount);
 
 router
   .route("/:userId")
@@ -42,7 +65,12 @@ router
     paramValidator(userIdValidator),
     removeUser
   )
-  .get(authMiddleware, checkRole("admin"), paramValidator(userIdValidator) , getUserInfo);
+  .get(
+    authMiddleware,
+    checkRole("admin"),
+    paramValidator(userIdValidator),
+    getUserInfo
+  );
 
 router
   .route("/:userId/change-role")
@@ -54,5 +82,4 @@ router
     changeUserRole
   );
 
-
-export default router
+export default router;

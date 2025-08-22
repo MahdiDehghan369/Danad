@@ -5,6 +5,7 @@ import { IUser, UserRole } from "./user.model";
 import { IEditUserInfo, IGetUsersQuery, userRepo } from "./user.repo";
 import bcrypt from "bcrypt";
 import fs from "fs";
+import { refreshTokenRepo } from "../refreshToken/refresh.repo";
 
 export const changePasswordService = async (
   userId: string,
@@ -154,3 +155,50 @@ export const removeProfileService = async (userId: string) => {
 
   await user.save();
 };
+
+export const getActiveAccountsService = async (userId: string) => {
+  const user = await userRepo.findById(userId);
+
+  if (!user) throw new AppError("User not found", 404);
+
+  const activeAccounts = await refreshTokenRepo.find({
+    user: userId,
+    expireIn: { $gt: new Date() },
+  });
+
+  return activeAccounts;
+};
+
+export const removeAccountService = async (
+  userId: string,
+  accountId: string
+) => {
+  const user = await userRepo.findById(userId);
+
+  if (!user) throw new AppError("User not found", 404);
+  const account = await refreshTokenRepo.findById(accountId);
+  if (!account) throw new AppError("Account not found", 404);
+
+  if (String(account.user) !== String(userId)) {
+    throw new AppError("You are not allowed to remove this account", 403);
+  }
+
+  await refreshTokenRepo.removeById(accountId);
+};
+
+export const removeAllAccountsService = async (userId: string) => {
+  const user = await userRepo.findById(userId)
+
+  if(!user) throw new AppError("User not found" , 404)
+
+  const accounts = await refreshTokenRepo.find({
+    user: userId,
+    expireIn: { $gt: new Date() },
+  });
+
+  if(accounts.length === 0) throw new AppError("You don't have any account" , 400)
+
+  await Promise.all(
+    accounts.map((acc) => refreshTokenRepo.removeById(String(acc._id)))
+  );
+}
