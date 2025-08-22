@@ -1,8 +1,10 @@
+import path from "path";
 import { AppError } from "../../utils/appError";
 import { banRepo } from "../ban/ban.repo";
 import { IUser, UserRole } from "./user.model";
-import { IEditUserInfo, userRepo } from "./user.repo";
+import { IEditUserInfo, IGetUsersQuery, userRepo } from "./user.repo";
 import bcrypt from "bcrypt";
+import fs from "fs";
 
 export const changePasswordService = async (
   userId: string,
@@ -42,44 +44,113 @@ export const editUserInfoService = async (
   if (isUsernameExists?._id != userId.toString())
     throw new AppError("Username already exists", 409);
 
-  const result = await userRepo.updateUserById(userId , data) as IUser
+  const result = (await userRepo.updateUserById(userId, data)) as IUser;
 
-  return result
+  return result;
 };
 
 export const removeUserService = async (userId: string) => {
-  const user = await userRepo.findOneAndDelete({_id: userId})
+  const user = await userRepo.findOneAndDelete({ _id: userId });
 
-  if(!user) throw new AppError("User not found :(" , 404)
+  if (!user) throw new AppError("User not found :(", 404);
 
-  await banRepo.removeUser(userId)
+  await banRepo.removeUser(userId);
 
   return {
     id: user._id,
     username: user.username,
     email: user.email,
-    fullname: user.fullname
-  }
-}
+    fullname: user.fullname,
+  };
+};
 
 export const getUserInfoService = async (userId: string) => {
-  const user = await userRepo.findById(userId)
+  const user = await userRepo.findById(userId);
 
-  if(!user) throw new AppError("User not found" , 404)
+  if (!user) throw new AppError("User not found", 404);
 
-    user.password = ""
+  user.password = "";
 
-    return user
-}
+  return user;
+};
 
-export const changeUserRoleService = async (userId: string , role: UserRole) => {
+export const changeUserRoleService = async (userId: string, role: UserRole) => {
+  const user = await userRepo.findById(userId);
 
-  const user = await userRepo.findById(userId)
+  if (!user) throw new AppError("User not found", 404);
 
-  if(!user) throw new AppError("User not found" , 404)
+  if (user.role === role) throw new AppError("The user has this role", 409);
 
-  if(user.role === role) throw new AppError("The user has this role" , 409)
+  await userRepo.findOneAndUpdate({ _id: userId }, { role });
+};
 
-  await userRepo.findOneAndUpdate({_id: userId} , {role})
+export const getUsersService = async (query: IGetUsersQuery) => {
+  const users = await userRepo.find(query);
+  return users;
+};
 
-}
+export const setProfileService = async (
+  userId: string,
+  filename: string | undefined
+) => {
+  if (!filename) throw new AppError("Upload file is required", 422);
+  const user = await userRepo.findById(userId);
+
+  if (!user) throw new AppError("User not found", 404);
+
+  if (user.avatar) {
+    const oldPath = path.join(
+      __dirname,
+      "..",
+      "..",
+      "..",
+      "public",
+      user.avatar
+    );
+    try {
+      await fs.promises.unlink(oldPath);
+    } catch (err: any) {
+      if (err.code !== "ENOENT") {
+        throw new AppError("Error removing old profile", 500);
+      }
+    }
+  }
+
+  const profilePath = `/profile/${filename}`;
+
+  const updatedUser = (await userRepo.updateUserById(userId, {
+    avatar: profilePath,
+  })) as IUser;
+
+  updatedUser.password = "";
+
+  return updatedUser;
+};
+
+export const removeProfileService = async (userId: string) => {
+  const user = await userRepo.findById(userId);
+
+  if (!user) throw new AppError("User not found", 404);
+
+  if (!user.avatar) {
+    throw new AppError("User does not have a profile photo", 400);
+  }
+  const profilePath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "..",
+    "public",
+    user.avatar
+  );
+
+  try {
+    await fs.promises.unlink(profilePath);
+  } catch (err: any) {
+    throw new AppError(err.message, 500);
+  }
+
+  user.avatar = "";
+
+  await user.save();
+};

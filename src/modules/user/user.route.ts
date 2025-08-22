@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
-import { changePassword, changeUserRole, editUserInfo, getUserInfo, removeUser } from "./user.ctrl";
+import { changePassword, changeUserRole, editUserInfo, getUserInfo, getUsers, removeProfile, removeUser, setProfile } from "./user.ctrl";
 import { bodyValidator } from "../../middlewares/bodyValidator";
-import { changePasswordValidator, editUserInfoValidator, userIdValidator, userRoleValidator } from "./user.validator";
+import { changePasswordValidator, editUserInfoValidator, getUsersQueryValidator, userIdValidator, userRoleValidator } from "./user.validator";
 import { checkRole } from "../../middlewares/checkRole";
 import { paramValidator } from "../../middlewares/paramValidator";
+import { queryValidator } from "../../middlewares/queryValidator";
+import uploadPhoto from "../../middlewares/multer";
 
 const router = Router()
 
@@ -18,7 +20,19 @@ router
 
 router
   .route("/")
-  .put(authMiddleware, bodyValidator(editUserInfoValidator), editUserInfo);
+  .put(authMiddleware, bodyValidator(editUserInfoValidator), editUserInfo)
+  .get(
+    authMiddleware,
+    checkRole("admin"),
+    queryValidator(getUsersQueryValidator),
+    getUsers
+  );
+
+  router
+    .route("/profile")
+    .post(authMiddleware, uploadPhoto.single("profile"), setProfile)
+    .delete(authMiddleware, removeProfile);
+
 
 router
   .route("/:userId")
@@ -39,5 +53,6 @@ router
     bodyValidator(userRoleValidator),
     changeUserRole
   );
+
 
 export default router

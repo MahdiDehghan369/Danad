@@ -42,3 +42,12 @@ export const userRoleValidator = yup.object().shape({
     .oneOf(["admin", "student", "teacher"], "Invalid user role")
     .required("User role is required"),
 });
+
+
+export const getUsersQueryValidator = yup.object({
+  role: yup.string().oneOf(["admin", "teacher" , "student"]).notRequired(),
+
+  limit: yup.number().integer().min(1).max(100).default(10),
+
+  page: yup.number().integer().min(1).default(1),
+});
