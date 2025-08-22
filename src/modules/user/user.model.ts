@@ -20,12 +20,12 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>(
   {
-    fullname: { type: String, trim: true },
+    fullname: { type: String, trim: true , default: ""},
     username: { type: String, required: true, unique: true, lowercase: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     phone: { type: String, unique: true, sparse: true },
     password: { type: String, required: true, minlength: 8 },
-    avatar: { type: String },
+    avatar: { type: String , default :""},
 
     role: {
       type: String,

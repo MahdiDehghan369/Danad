@@ -100,4 +100,7 @@ export const banRepo = {
     });
     return ban
   },
+  removeUser: async (userId: string) : Promise<void> => {
+    await banModel.deleteMany({user: userId})
+  }
 };
