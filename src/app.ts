@@ -5,6 +5,7 @@ const app = express()
 import authRouter from "./modules/auth/auth.route"
 import banRouter from "./modules/ban/ban.route"
 import userRouter from "./modules/user/user.route";
+import categoryRouter from "./modules/category/category.route";
 
 import {errorHandler} from "./middlewares/errorHandler"
 
@@ -18,6 +19,7 @@ app.use(cookieParser());
 app.use("/auth" , authRouter)
 app.use("/ban" , banRouter)
 app.use("/users" , userRouter)
+app.use("/categories" , categoryRouter)
 
     
 // set error-handler
