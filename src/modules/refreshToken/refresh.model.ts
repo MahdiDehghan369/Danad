@@ -9,7 +9,6 @@ interface IRefreshToken {
   isValid: boolean
 }
 
-
 const refreshTokenSchema = new Schema(
   {
     token: {
