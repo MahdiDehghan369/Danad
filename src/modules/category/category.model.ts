@@ -1,14 +1,16 @@
 import { Types , Document , Schema , model } from "mongoose";
 
 export interface ICategory extends Document {
-    title: string,
-    slug: string,
-    description: string,
-    type: "blog" | "course",
-    status: "active" | "inactive"
-    createdBy: Types.ObjectId,
-    createdAt: Date,
-    updatedAt: Date
+  _id: Types.ObjectId;
+  title: string;
+  slug: string;
+  description: string;
+  type: "blog" | "course";
+  status: "active" | "inactive";
+  parent: Types.ObjectId | null;
+  createdBy: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 
@@ -43,6 +45,10 @@ const categorySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true
+    },
+    parent: {
+        type: Schema.Types.ObjectId,
+        default: null
     }
 }, {
     timestamps: true

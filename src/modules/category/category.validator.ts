@@ -28,6 +28,11 @@ export const categorySchema = yup.object().shape({
     .string()
     .oneOf(["active", "inactive"], "Status must be either active or inactive")
     .notRequired(),
+
+  parent: yup
+    .string()
+    .notRequired()
+    .matches(/^[0-9a-fA-F]{24}$/, "Invalid Category ID format"),
 });
 
 export const categoryIdValidator = yup.object().shape({
