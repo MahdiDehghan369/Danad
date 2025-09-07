@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import {
+  changeStatusService,
   createCategoryService,
   editCategoryService,
+  getCategoriesTreeService,
   getCategoryService,
   removeCategoryService,
 } from "./category.service";
@@ -84,3 +86,29 @@ export const editCategory = async (
     next(error);
   }
 };
+
+export const changeStatus = async (req: Request , res: Response , next: NextFunction) => {
+  try {
+    
+    const { categoryId } = req.params
+
+    await changeStatusService(categoryId)
+
+    return successResponse(res, 200, "Category's status changed successfully");
+
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getCategoriesTree = async (req: Request , res: Response , next: NextFunction) => {
+  try {
+    
+    const result = await getCategoriesTreeService()
+
+    return successResponse(res, 200, "Category fetched successfully", result);
+
+  } catch (error) {
+    next(error)
+  }
+}

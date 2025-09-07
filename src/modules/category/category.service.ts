@@ -110,3 +110,20 @@ export const editCategoryService = async (
 
   return result as ICategory;
 };
+
+export const changeStatusService = async (categoryId: string) => {
+  const category = await categoryRepo.findById(categoryId)
+  if(!category) throw new AppError("Category not found" , 404)
+
+  if(category.status === "active"){
+    await categoryRepo.updateOne({_id: categoryId} , {status: "inactive"})
+  }else if(category.status === "inactive"){
+    await categoryRepo.updateOne({ _id: categoryId }, { status: "active" });
+  }
+} 
+
+export const getCategoriesTreeService = async () => {
+  const categories = await categoryRepo.getCategoriesTreeAggregation()
+
+  return categories
+}

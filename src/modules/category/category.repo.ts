@@ -44,5 +44,26 @@ export const categoryRepo = {
     await categoryModel.findByIdAndUpdate(categoryId, data, { new: true }),
   updateMany: async (condition: object, set: object): Promise<UpdateResult> =>
     await categoryModel.updateMany(condition, set),
-  find: async(condition: object) : Promise<ICategory[] | null> => await categoryModel.find(condition)
+  find: async (condition: object): Promise<ICategory[] | null> =>
+    await categoryModel.find(condition),
+  updateOne: async (condition: object, set: object): Promise<UpdateResult> =>
+    await categoryModel.updateOne(condition, set),
+  getCategoriesTreeAggregation: async () => {
+     const categories = await categoryModel.aggregate([
+       {
+         $graphLookup: {
+           from: "categories",
+           startWith: "$_id",
+           connectFromField: "_id",
+           connectToField: "parent",
+           as: "children",
+         },
+       },
+       {
+         $match: { parent: null }, 
+       },
+     ]);
+
+     return categories;
+  }
 };

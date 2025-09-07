@@ -2,8 +2,10 @@ import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
 import {
+  changeStatus,
   createCategory,
   editCategory,
+  getCategoriesTree,
   getCategory,
   removeCategory,
 } from "./category.ctrl";
@@ -19,7 +21,10 @@ router
     checkRole("admin"),
     bodyValidator(categorySchema),
     createCategory
-  );
+  ).get(authMiddleware , checkRole("admin") , getCategoriesTree)
+
+
+
 router
   .route("/:categoryId")
   .get(
@@ -39,6 +44,12 @@ router
     checkRole("admin"),
     paramValidator(categoryIdValidator),
     editCategory
+  )
+  .patch(
+    authMiddleware,
+    checkRole("admin"),
+    paramValidator(categoryIdValidator),
+    changeStatus
   );
 
 export default router;
