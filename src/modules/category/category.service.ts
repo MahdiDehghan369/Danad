@@ -9,6 +9,7 @@ import {
 } from "./category.repo";
 
 type DeleteType = "cascade" | "single";
+export type StatusCategoryType = "active" | "inactive" | undefined;
 
 export const createCategoryService = async (data: ICategoryData) => {
   data.slug = slugify(data.slug);
@@ -122,8 +123,7 @@ export const changeStatusService = async (categoryId: string) => {
   }
 } 
 
-export const getCategoriesTreeService = async () => {
-  const categories = await categoryRepo.getCategoriesTreeAggregation()
-
-  return categories
-}
+export const getCategoriesTreeService = async (status: StatusCategoryType) => {
+  const categories = await categoryRepo.getCategoriesTreeAggregation(status);
+  return categories;
+};

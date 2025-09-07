@@ -6,6 +6,7 @@ import {
   getCategoriesTreeService,
   getCategoryService,
   removeCategoryService,
+  StatusCategoryType,
 } from "./category.service";
 import { ICategoryData } from "./category.repo";
 import { successResponse } from "../../utils/response";
@@ -103,8 +104,11 @@ export const changeStatus = async (req: Request , res: Response , next: NextFunc
 
 export const getCategoriesTree = async (req: Request , res: Response , next: NextFunction) => {
   try {
+
+    const status =
+      typeof req.query.status === "string" ? req.query.status : undefined;
     
-    const result = await getCategoriesTreeService()
+    const result = await getCategoriesTreeService(status as StatusCategoryType);
 
     return successResponse(res, 200, "Category fetched successfully", result);
 
