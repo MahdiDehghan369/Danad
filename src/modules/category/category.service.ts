@@ -8,6 +8,8 @@ import {
   IEditCategoryData,
 } from "./category.repo";
 
+type DeleteType = "cascade" | "single";
+
 export const createCategoryService = async (data: ICategoryData) => {
   data.slug = slugify(data.slug);
   const category = await categoryRepo.findOneBySlug(data.slug, data.type);
@@ -37,12 +39,31 @@ export const getCategoryService = async (categoryId: string) => {
   return category;
 };
 
-export const removeCategoryService = async (categoryId: string) => {
-  const result = await categoryRepo.removeById(categoryId);
+export const removeCategoryService = async (categoryId: string, type: DeleteType) => {
+  
+  const categoryExists = await categoryRepo.findById(categoryId)
 
-  if (!result) throw new AppError("Category not found", 404);
+  if(!categoryExists) throw new AppError("Category not found" , 404)
 
-  return result;
+  if(type === "single"){
+    await categoryRepo.removeById(categoryId)
+    await categoryRepo.updateMany({parent: categoryId} , {parent: null})
+  }else if(type === "cascade"){
+    await categoryRepo.removeById(categoryId);
+    const childCategories = await categoryRepo.find({parent: categoryId})
+
+    if (childCategories && childCategories.length > 0) {
+      await Promise.all(
+        childCategories.map(
+          (child) => removeCategoryService(child._id.toString(), "cascade")
+        )
+      );
+    }
+
+    return { deletedId: categoryId, type };
+
+  }
+
 };
 
 export const editCategoryService = async (

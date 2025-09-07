@@ -1,5 +1,6 @@
 import { Types } from "mongoose"
 import categoryModel ,{ICategory} from "./category.model"
+import { UpdateResult } from "mongoose";
 
 export interface ICategoryData {
     title: string,
@@ -21,9 +22,27 @@ export interface IEditCategoryData {
 }
 
 export const categoryRepo = {
-    create: async (data: ICategoryData) : Promise<ICategory>=> await categoryModel.create(data),
-    findOneBySlug: async (slug: string, type: string) : Promise<ICategory | null> => await categoryModel.findOne({slug, type}).lean(),
-    findById: async (categoryId: string) : Promise<ICategory | null> => await categoryModel.findById(categoryId , "-__v").populate("createdBy" , "name avatar username").populate("parent").lean(),
-    removeById: async (categoryId: string) : Promise<ICategory | null> => await categoryModel.findByIdAndDelete(categoryId),
-    updateCategoryById: async (categoryId: string , data: IEditCategoryData) : Promise<ICategory | null> => await categoryModel.findByIdAndUpdate(categoryId , data , {new: true})
-}
+  create: async (data: ICategoryData): Promise<ICategory> =>
+    await categoryModel.create(data),
+  findOneBySlug: async (
+    slug: string,
+    type: string
+  ): Promise<ICategory | null> =>
+    await categoryModel.findOne({ slug, type }).lean(),
+  findById: async (categoryId: string): Promise<ICategory | null> =>
+    await categoryModel
+      .findById(categoryId, "-__v")
+      .populate("createdBy", "name avatar username")
+      .populate("parent")
+      .lean(),
+  removeById: async (categoryId: string): Promise<ICategory | null> =>
+    await categoryModel.findByIdAndDelete(categoryId),
+  updateCategoryById: async (
+    categoryId: string,
+    data: IEditCategoryData
+  ): Promise<ICategory | null> =>
+    await categoryModel.findByIdAndUpdate(categoryId, data, { new: true }),
+  updateMany: async (condition: object, set: object): Promise<UpdateResult> =>
+    await categoryModel.updateMany(condition, set),
+  find: async(condition: object) : Promise<ICategory[] | null> => await categoryModel.find(condition)
+};

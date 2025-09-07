@@ -55,8 +55,13 @@ export const removeCategory = async (
 ) => {
   try {
     const { categoryId } = req.params;
+    const type = req.query.type;
+    
+    if (type !== "cascade" && type !== "single") {
+      throw new Error("Invalid delete type");
+    }
 
-    const result = await removeCategoryService(categoryId);
+    const result = await removeCategoryService(categoryId, type);
 
     return successResponse(res, 200, "Category removed successfully", result);
   } catch (error) {
