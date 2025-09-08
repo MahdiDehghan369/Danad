@@ -9,15 +9,23 @@ if (!fs.existsSync(pathPublicFolder)) {
   fs.mkdirSync(pathPublicFolder);
 }
 
-const destination = path.join(pathPublicFolder, "profile");
+const destinationProfile = path.join(pathPublicFolder, "profile");
+const destinationCourseCover = path.join(pathPublicFolder, "course-cover");
 
-if (!fs.existsSync(destination)) {
-  fs.mkdirSync(destination);
+if (!fs.existsSync(destinationProfile)) {
+  fs.mkdirSync(destinationProfile);
+}
+
+if (!fs.existsSync(destinationCourseCover)) {
+  fs.mkdirSync(destinationCourseCover);
 }
 
 const multerStorage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, destination);
+    if(file.fieldname === "profile")
+      cb(null, destinationProfile);
+    else
+      cb(null, destinationCourseCover);
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
