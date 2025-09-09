@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { changeStatusCourseService, createCourseService, editCourseService, removeCourseService } from "./course.service";
+import { changeStatusCourseService, changeTeacherCourseService, createCourseService, editCourseService, removeCourseService } from "./course.service";
 import { successResponse } from "../../utils/response";
 import fs from "fs";
 import path from "path";
@@ -86,6 +86,26 @@ export const changeStatusCourse = async (req: Request , res: Response , next: Ne
     const result = await changeStatusCourseService(courseId , req.body.status)
 
     return successResponse(res, 200 , "Course's status changed successfully" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const changeTeacherCourse = async (req: Request , res: Response , next: NextFunction) => {
+  try {
+
+    const {courseId} = req.params
+
+    const result = await changeTeacherCourseService(courseId, req.body.teacher);
+
+    return successResponse(
+      res,
+      200,
+      "Course's teacher changed successfully",
+      result
+    );
+
     
   } catch (error) {
     next(error)

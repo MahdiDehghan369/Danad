@@ -98,3 +98,10 @@ export const statusCourse = yup.object().shape({
     .mixed<"completed" | "pending" | "draft">()
     .oneOf(["completed", "pending", "draft"], "Invalid status").required()
 });
+
+export const teacherIdValidator = yup.object().shape({
+  teacher: yup
+    .string()
+    .required("Teacher ID is required")
+    .matches(/^[0-9a-fA-F]{24}$/, "Invalid Teacher ID format"),
+});

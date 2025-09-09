@@ -7,6 +7,7 @@ import { courseRepo, ICreateCourseData } from "./course.repo";
 import fs from "fs"
 import { ICourse } from "./course.model";
 import mongoose from "mongoose";
+import { banRepo } from "../ban/ban.repo";
 
 type statusCourse = "completed" | "pending" | "draft";
 
@@ -106,6 +107,24 @@ export const changeStatusCourseService = async(courseId: string , status: status
   if(!course) throw new AppError("Course not found" , 404)
 
   const updatedCourse = await courseRepo.findByIdAndUpdate(courseId , {status})
+
+  return updatedCourse as ICourse
+}
+
+export const changeTeacherCourseService = async(courseId: string , teacher: string) => {
+  const course = await courseRepo.findOne({_id: courseId})
+
+  if(!course) throw new AppError("Course not found" , 404)
+
+  const teacherExists = await userRepo.findById(teacher)
+
+  if(!teacherExists || teacherExists.role !== "teacher") throw new AppError("Teacher not found" , 404)
+
+  const teacherBan = await banRepo.getBanInfo(teacher)
+
+  if(teacherBan) throw new AppError("Teacher already banned" , 400)
+
+  const updatedCourse = await courseRepo.findByIdAndUpdate(courseId , {teacher})
 
   return updatedCourse as ICourse
 }
