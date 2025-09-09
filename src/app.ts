@@ -7,6 +7,7 @@ import banRouter from "./modules/ban/ban.route"
 import userRouter from "./modules/user/user.route";
 import categoryRouter from "./modules/category/category.route";
 import courseRouter from "./modules/course/course.route";
+import walletRouter from "./modules/wallet/wallet.route";
 
 import {errorHandler} from "./middlewares/errorHandler"
 
@@ -22,6 +23,7 @@ app.use("/ban" , banRouter)
 app.use("/users" , userRouter)
 app.use("/categories" , categoryRouter)
 app.use("/courses" , courseRouter)
+app.use("/wallet", walletRouter);
 
     
 // set error-handler
