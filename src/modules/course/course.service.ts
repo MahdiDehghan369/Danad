@@ -8,6 +8,8 @@ import fs from "fs"
 import { ICourse } from "./course.model";
 import mongoose from "mongoose";
 
+type statusCourse = "completed" | "pending" | "draft";
+
 export const createCourseService = async(data: ICreateCourseData) => {
 
     if(!data.cover) throw new AppError("No Cover Uploaded" , 422)
@@ -82,4 +84,28 @@ export const editCourseService = async (data: ICreateCourseData , courseId: stri
     const editCourse = await courseRepo.findByIdAndUpdate(courseId , data);
 
     return editCourse as ICourse;
+}
+
+export const removeCourseService = async(courseId: string) => {
+  const course = await courseRepo.findOne({_id: courseId})
+
+  if(!course) throw new AppError("Course not found" , 404)
+
+  if(course.cover){
+    const coverPath = path.join(__dirname , ".." , ".." , ".." , "public" , course.cover.replace(/^\/+/, ""))
+
+    if(fs.existsSync(coverPath)) fs.unlinkSync(coverPath)
+  }
+
+  await courseRepo.deleteOne({_id: courseId})
+}
+
+export const changeStatusCourseService = async(courseId: string , status: statusCourse) => {
+  const course = await courseRepo.findOne({_id: courseId})
+
+  if(!course) throw new AppError("Course not found" , 404)
+
+  const updatedCourse = await courseRepo.findByIdAndUpdate(courseId , {status})
+
+  return updatedCourse as ICourse
 }

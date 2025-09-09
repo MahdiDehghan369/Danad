@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { DeleteResult, Types } from "mongoose";
 import courseModel, { ICourse } from "./course.model";
 
 export interface ICreateCourseData {
@@ -22,4 +22,5 @@ export const courseRepo = {
     await courseModel.findOne(condition),
   findByIdAndUpdate: async (courseId: string, data: object) : Promise<ICourse | null> =>
     await courseModel.findByIdAndUpdate(courseId, data , {new: true}),
+  deleteOne: async(condition: object) : Promise<DeleteResult> => await courseModel.deleteOne(condition)
 };

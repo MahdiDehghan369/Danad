@@ -92,3 +92,9 @@ export const courseIdValidator = yup.object().shape({
     .required("course ID is required")
     .matches(/^[0-9a-fA-F]{24}$/, "Invalid course ID format"),
 });
+
+export const statusCourse = yup.object().shape({
+  status: yup
+    .mixed<"completed" | "pending" | "draft">()
+    .oneOf(["completed", "pending", "draft"], "Invalid status").required()
+});
