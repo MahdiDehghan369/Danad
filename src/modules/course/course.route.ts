@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
-import { changeStatusCourse, changeTeacherCourse, createCourse, editCourse, removeCourse } from "./course.ctrl";
+import { changeStatusCourse, changeTeacherCourse, createCourse, editCourse, removeCourse, removeCourseCover } from "./course.ctrl";
 import uploadPhoto from "../../middlewares/multer";
 import { bodyValidator } from "../../middlewares/bodyValidator";
 import { courseIdValidator, createCourseSchema, statusCourse, teacherIdValidator, updateCourseSchema } from "./course.validator";
@@ -28,5 +28,7 @@ router.route("/:courseId").put(
 router.route("/:courseId/status").patch(authMiddleware , checkRole("admin") , paramValidator(courseIdValidator) , bodyValidator(statusCourse) , changeStatusCourse)
 
 router.route("/:courseId/teacher").patch(authMiddleware , checkRole("admin") , paramValidator(courseIdValidator) , bodyValidator(teacherIdValidator) , changeTeacherCourse)
+
+router.route("/:courseId/cover").delete(authMiddleware , checkRole("admin") , paramValidator(courseIdValidator) , removeCourseCover)
 
 export default router

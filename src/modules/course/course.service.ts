@@ -128,3 +128,32 @@ export const changeTeacherCourseService = async(courseId: string , teacher: stri
 
   return updatedCourse as ICourse
 }
+
+export const removeCourseCoverService = async (courseId: string) => {
+
+  const course = await courseRepo.findOne({_id: courseId})
+
+  if(!course) throw new AppError("Course not found" , 404)
+
+  if(!course.cover) throw new AppError("Course don't have cover to remove" , 404)
+
+  const coverPath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "..",
+    "public",
+    course.cover.replace(/^\/+/, "")
+  );
+
+    try {
+      if (fs.existsSync(coverPath)) {
+        fs.unlinkSync(coverPath);
+      }
+    } catch (err) {
+      throw new AppError("Failed to remove course cover from disk", 500);
+    }
+
+
+  await courseRepo.findByIdAndUpdate(courseId , {cover: null})
+}
