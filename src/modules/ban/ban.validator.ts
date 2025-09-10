@@ -14,7 +14,7 @@ export const banUserValidator = yup.object().shape({
     .date()
     .min(new Date(), "End date must be in the future")
     .notRequired()
-    .nullable(), 
+    .nullable(),
 });
 
 export const userIdValidator = yup.object().shape({

@@ -8,6 +8,7 @@ import userRouter from "./modules/user/user.route";
 import categoryRouter from "./modules/category/category.route";
 import courseRouter from "./modules/course/course.route";
 import walletRouter from "./modules/wallet/wallet.route";
+import transactionRouter from "./modules/transaction/transaction.route";
 
 import {errorHandler} from "./middlewares/errorHandler"
 
@@ -24,6 +25,7 @@ app.use("/users" , userRouter)
 app.use("/categories" , categoryRouter)
 app.use("/courses" , courseRouter)
 app.use("/wallet", walletRouter);
+app.use("/transactions", transactionRouter);
 
     
 // set error-handler
