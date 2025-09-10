@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { depositService, getTransactionsService, getWalletBalanceService } from "./wallet.service";
+import { depositService, getTransactionsService, getWalletBalanceService, giftDepositService } from "./wallet.service";
 import { successResponse } from "../../utils/response";
+import { AppError } from "../../utils/appError";
 
 export const deposit = async(req: ICustomRequest , res: Response , next: NextFunction) => {
     try {
@@ -39,6 +40,25 @@ export const getWalletBalance = async (req: ICustomRequest , res: Response , nex
         const result = await getWalletBalanceService(userId)
 
         return successResponse(res, 200 , "Get balance successfully" , result)
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const giftDeposit = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+    try {
+
+        const userId = req.params.userId as string
+
+        if (userId.toString() == req.user?._id as string) {
+          throw new AppError("You cannot gift yourself", 400);
+        }
+
+
+        const result = await giftDepositService(userId , req.body)
+
+        return successResponse(res, 200 , "Successfully" , result)
         
     } catch (error) {
         next(error)
