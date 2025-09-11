@@ -4,7 +4,7 @@ export interface ITransaction {
   _id: Types.ObjectId;
   user: Types.ObjectId;
   wallet: Types.ObjectId;
-  type: "deposit" | "purchase" | "refund" | "gift";
+  type: "deposit" | "purchase" | "refund" | "gift" | "manual";
   amount: number;
   status: "pending" | "success" | "failed";
   description: string;
@@ -26,7 +26,7 @@ const transactionSchema = new Schema<ITransaction>(
     },
     type: {
       type: String,
-      enum: ["deposit", "purchase", "refund", "gift"],
+      enum: ["deposit", "purchase", "refund", "gift" , "manual"],
       required: true,
     },
     amount: {

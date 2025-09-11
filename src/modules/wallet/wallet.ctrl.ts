@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { depositService, getTransactionsService, getWalletBalanceService, giftDepositService } from "./wallet.service";
+import { depositService, editInventoryService, getTransactionsService, getWalletBalanceService, giftDepositService } from "./wallet.service";
 import { successResponse } from "../../utils/response";
 import { AppError } from "../../utils/appError";
 
@@ -59,6 +59,20 @@ export const giftDeposit = async (req: ICustomRequest , res: Response , next: Ne
         const result = await giftDepositService(userId , req.body)
 
         return successResponse(res, 200 , "Successfully" , result)
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const editInventory = async(req: Request , res: Response , next: NextFunction) => {
+    try {
+
+        const {userId} = req.params
+
+        const result = await editInventoryService(userId , req.body)
+
+        return successResponse(res, 200, "Inventory edited successfully" , result);
         
     } catch (error) {
         next(error)

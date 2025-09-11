@@ -6,6 +6,11 @@ import { AppError } from "../../utils/appError";
 import { userRepo } from "../user/user.repo";
 import { banRepo } from "../ban/ban.repo";
 
+interface IEditInventory {
+  amount: number;
+  description: string;
+}
+
 export const depositService = async (userId: string, data: IDepositData) => {
   const wallet = await walletRepo.findOrCreate({ user: userId, balance: 0 });
 
@@ -47,9 +52,9 @@ export const giftDepositService = async (
 
   if (!user) throw new AppError("User not found", 404);
 
-  const userBanned = await banRepo.getBanInfo(userId)
+  const userBanned = await banRepo.getBanInfo(userId);
 
-  if(userBanned) throw new AppError("User already banned" , 400)
+  if (userBanned) throw new AppError("User already banned", 400);
 
   const wallet = await walletRepo.findOrCreate({ user: userId, balance: 0 });
 
@@ -67,4 +72,53 @@ export const giftDepositService = async (
   );
 
   return { wallet: updatedWallet, transaction };
+};
+
+export const editInventoryService = async (
+  userId: string,
+  data: IEditInventory
+) => {
+
+  const userBanned = await banRepo.getBanInfo(userId)
+
+  if(userBanned) throw new AppError("User already banned" , 400)
+
+
+  const wallet = await walletRepo.findOne({ user: userId });
+
+  if (!wallet) {
+    const createdWallet = await walletRepo.findOrCreate({
+      user: userId,
+      balance: data.amount,
+    });
+
+    const transaction = await transactionRepo.create({
+      user: userId,
+      wallet: createdWallet?._id.toString() as string,
+      type: "manual",
+      amount: data.amount,
+      description: data.description,
+      gateway: "manual",
+      refId: generateRefId(),
+    });
+
+    return { createdWallet, transaction };
+  }
+
+  const updatedWallet = await walletRepo.findOneAndupdate(
+    { user: userId },
+    { balance: data.amount }
+  );
+
+  const transaction = await transactionRepo.create({
+    user: userId,
+    wallet: wallet?._id.toString() as string,
+    type: "manual",
+    amount: data.amount,
+    description: data.description,
+    gateway: "manual",
+    refId: generateRefId(),
+  });
+
+  return { updatedWallet, transaction };
 };

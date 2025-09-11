@@ -4,7 +4,7 @@ import transactionModel, { ITransaction } from "./transaction.model";
 export interface IDepositData {
   user: string;
   wallet: string;
-  type: "deposit" | "purchase" | "refund" | "gift";
+  type: "deposit" | "purchase" | "refund" | "gift" | "manual";
   amount: number;
   description: string;
   gateway: "zarinpal" | "manual";
