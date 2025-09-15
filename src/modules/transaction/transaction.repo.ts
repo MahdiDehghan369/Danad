@@ -20,7 +20,7 @@ export const transactionRepo = {
     await transactionModel
       .find(condition, "-__v -user -wallet")
       .sort({ createdAt: -1 }),
-  findAll: async (filter = {}, page = 1, limit = 20) => {
+  findAll: async (filter = {}, page = 1, limit = 10) => {
     const transactions = await transactionModel.find(filter, {
       amount: 1,
       type: 1,
