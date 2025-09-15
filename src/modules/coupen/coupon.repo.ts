@@ -7,6 +7,7 @@ export interface ICreateCoupon {
   value: number;
   startAt: Date;
   endAt: Date;
+  usageLimit: number;
   isActive?: boolean;
 }
 

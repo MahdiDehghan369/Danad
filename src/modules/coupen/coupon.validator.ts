@@ -31,6 +31,13 @@ export const createCouponSchema = yup.object({
     .required("End date is required")
     .min(yup.ref("startAt"), "End date must be after start date"),
 
+  usageLimit: yup
+    .number()
+    .typeError("Usage limit must be a number")
+    .required("Usage limit is required")
+    .integer("Usage limit must be an integer")
+    .min(1, "Usage limit must be at least 1"),
+
   isActive: yup.boolean().notRequired(),
 });
 
@@ -73,6 +80,13 @@ export const editCouponSchema = yup.object({
     .typeError("End date must be a valid date")
     .required("End date is required")
     .min(yup.ref("startAt"), "End date must be after start date"),
+
+  usageLimit: yup
+    .number()
+    .typeError("Usage limit must be a number")
+    .required("Usage limit is required")
+    .integer("Usage limit must be an integer")
+    .min(1, "Usage limit must be at least 1"),
 
   isActive: yup.boolean().required("isActive is required"),
 });
