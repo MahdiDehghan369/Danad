@@ -9,6 +9,7 @@ import categoryRouter from "./modules/category/category.route";
 import courseRouter from "./modules/course/course.route";
 import walletRouter from "./modules/wallet/wallet.route";
 import transactionRouter from "./modules/transaction/transaction.route";
+import courseDiscountRouter from "./modules/discount/discount.route";
 
 import {errorHandler} from "./middlewares/errorHandler"
 
@@ -26,6 +27,7 @@ app.use("/categories" , categoryRouter)
 app.use("/courses" , courseRouter)
 app.use("/wallet", walletRouter);
 app.use("/transactions", transactionRouter);
+app.use("/course-discounts", courseDiscountRouter);
 
     
 // set error-handler
