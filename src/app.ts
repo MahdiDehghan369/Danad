@@ -11,6 +11,7 @@ import walletRouter from "./modules/wallet/wallet.route";
 import transactionRouter from "./modules/transaction/transaction.route";
 import courseDiscountRouter from "./modules/discount/discount.route";
 import couponRouter from "./modules/coupen/coupon.route";
+import cartRouter from "./modules/cart/cart.route";
 
 import {errorHandler} from "./middlewares/errorHandler"
 
@@ -30,6 +31,7 @@ app.use("/wallet", walletRouter);
 app.use("/transactions", transactionRouter);
 app.use("/course-discounts", courseDiscountRouter);
 app.use("/coupons", couponRouter);
+app.use("/carts", cartRouter);
 
     
 // set error-handler
