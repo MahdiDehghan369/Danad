@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { addItemToCartService, applyCouponService, checkoutService, getCartService, removeCouponCartService, removeItemService } from "./cart.service";
+import { addItemToCartService, applyCouponService, checkoutService, getCartService, getCouponUsageService, removeCouponCartService, removeItemService } from "./cart.service";
 import { successResponse } from "../../utils/response";
 
 export const getCart = async (
@@ -85,6 +85,18 @@ export const checkout = async (req: ICustomRequest , res: Response , next: NextF
 
     return successResponse(res, 200 , "Successfully" , result)
     
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getCouponUsage = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+    
+    const result = await getCouponUsageService(req.user?._id as string , req.query)
+
+    return successResponse(res, 200 , "Get successfully" , result)
+
   } catch (error) {
     next(error)
   }

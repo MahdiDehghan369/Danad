@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
-import { addItemToCart, applyCoupon, checkout, getCart, removeCouponCart, removeItem } from "./cart.ctrl";
+import { addItemToCart, applyCoupon, checkout, getCart, getCouponUsage, removeCouponCart, removeItem } from "./cart.ctrl";
 import { paramValidator } from "../../middlewares/paramValidator";
 import { applyCouponSchema, cartIdValidator, itemIdValidator } from "./cart.validator";
 import { bodyValidator } from "../../middlewares/bodyValidator";
 import { courseIdValidator } from "../course/course.validator";
+import { queryValidator } from "../../middlewares/queryValidator";
 
 const router = Router()
 
@@ -24,5 +25,7 @@ router
   .delete(authMiddleware, removeCouponCart);
 
 router.route("/checkout").post(authMiddleware , checkout)
+
+router.route("/coupons-usage").get(authMiddleware , getCouponUsage)
 
 export default router

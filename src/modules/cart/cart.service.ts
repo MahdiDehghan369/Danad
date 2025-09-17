@@ -6,7 +6,7 @@ import CourseDiscountModel from "../discount/discount.model";
 import { calcDiscountedPrice } from "../../utils/calcDiscountedPrice";
 import { couponRepo } from "../coupen/coupon.repo";
 import { isValidCoupon } from "../../utils/validationCoupon";
-import { couponUsageRepo } from "../couponUsage/couponUsage.repo";
+import { couponUsageRepo, IQueryGetCoupons } from "../couponUsage/couponUsage.repo";
 import { walletRepo } from "../wallet/wallet.repo";
 import { transactionRepo } from "../transaction/transaction.repo";
 import { generateRefId } from "../../utils/generateRefId";
@@ -325,3 +325,11 @@ export const checkoutService = async (userId: string) => {
 
   return { transaction: newTransaction, wallet: updatedWallet };
 };
+
+export const getCouponUsageService = async (userId: string , query: IQueryGetCoupons) => {
+  
+  const coupons = await couponUsageRepo.find(userId , query)
+
+  return coupons
+
+}
