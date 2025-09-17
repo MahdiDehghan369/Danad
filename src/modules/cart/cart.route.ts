@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
-import { addItemToCart, applyCoupon, getCart, removeCouponCart, removeItem } from "./cart.ctrl";
+import { addItemToCart, applyCoupon, checkout, getCart, removeCouponCart, removeItem } from "./cart.ctrl";
 import { paramValidator } from "../../middlewares/paramValidator";
 import { applyCouponSchema, cartIdValidator, itemIdValidator } from "./cart.validator";
 import { bodyValidator } from "../../middlewares/bodyValidator";
@@ -22,5 +22,7 @@ router
   .route("/coupon")
   .post(authMiddleware, bodyValidator(applyCouponSchema), applyCoupon)
   .delete(authMiddleware, removeCouponCart);
+
+router.route("/checkout").post(authMiddleware , checkout)
 
 export default router

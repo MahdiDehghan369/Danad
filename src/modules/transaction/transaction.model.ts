@@ -26,7 +26,7 @@ const transactionSchema = new Schema<ITransaction>(
     },
     type: {
       type: String,
-      enum: ["deposit", "purchase", "refund", "gift" , "manual"],
+      enum: ["deposit", "purchase", "refund", "gift", "manual"],
       required: true,
     },
     amount: {
@@ -37,7 +37,7 @@ const transactionSchema = new Schema<ITransaction>(
     status: {
       type: String,
       enum: ["pending", "success", "failed"],
-      default: "pending",
+      default: "success",
     },
     description: {
       type: String,
@@ -47,7 +47,7 @@ const transactionSchema = new Schema<ITransaction>(
       enum: ["zarinpal", "manual"],
     },
     refId: {
-      type: String, 
+      type: String,
     },
   },
   { timestamps: true }

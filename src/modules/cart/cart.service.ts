@@ -7,6 +7,10 @@ import { calcDiscountedPrice } from "../../utils/calcDiscountedPrice";
 import { couponRepo } from "../coupen/coupon.repo";
 import { isValidCoupon } from "../../utils/validationCoupon";
 import { couponUsageRepo } from "../couponUsage/couponUsage.repo";
+import { walletRepo } from "../wallet/wallet.repo";
+import { transactionRepo } from "../transaction/transaction.repo";
+import { generateRefId } from "../../utils/generateRefId";
+import { purchasedCourseRepo } from "../purchasedCourse/purchasedCourse.repo";
 
 export const getCartService = async (user: string) => {
   const cart = await cartRepo.findOrCreate(user);
@@ -121,7 +125,7 @@ export const removeItemService = async (userId: string, itemId: string) => {
 
       subtotal += courseItem.price;
       discountAmount += courseItem.price - discountedPrice;
-      finalTotal += subtotal - discountAmount
+      finalTotal += subtotal - discountAmount;
 
       return { ...item, price: courseItem.price, discountedPrice };
     })
@@ -201,7 +205,6 @@ export const removeCouponCartService = async (userId: string) => {
   return { cart };
 };
 
-
 export const applyCouponService = async (userId: string, code: string) => {
   const cart = await cartRepo.findOrCreate(userId);
 
@@ -246,4 +249,79 @@ export const applyCouponService = async (userId: string, code: string) => {
   await couponUsageRepo.create({ user: userId, coupon: coupon._id.toString() });
 
   return { cart };
+};
+
+export const checkoutService = async (userId: string) => {
+  const cart = await cartRepo.findOrCreate(userId);
+
+  if (cart.items.length === 0)
+    throw new AppError("Cart is empty , No item exists", 422);
+
+  const wallet = await walletRepo.findOne({ user: userId });
+
+  if (!wallet || wallet.balance < cart.finalTotal) throw new AppError("Insufficient balance", 400);
+
+  const newTransaction = await transactionRepo.create({
+    user: userId,
+    wallet: wallet._id.toString(),
+    type: "purchase",
+    amount: cart.finalTotal,
+    description: "Purchase course",
+    gateway: "manual",
+    refId: generateRefId(),
+  });
+
+  const updatedWallet = await walletRepo.findOneAndupdate(
+    { user: userId },
+    { $inc: { balance: -cart.finalTotal } }
+  );
+
+  for (const item of cart.items) {
+    const course = await courseRepo.findOne({ _id: item.course });
+    if (!course) continue;
+
+    const discounts = await CourseDiscountModel.find({ isActive: true }).lean();
+    const now = new Date();
+
+    const globalDiscount = discounts.find(
+      (d) =>
+        d.scope === "all" &&
+        (!d.startAt || d.startAt <= now) &&
+        (!d.endAt || d.endAt >= now)
+    );
+
+    const courseDiscount = discounts.find(
+      (d) =>
+        d.scope === "single" &&
+        String(d.course) === String(course._id) &&
+        (!d.startAt || d.startAt <= now) &&
+        (!d.endAt || d.endAt >= now)
+    );
+
+    const applied = courseDiscount || globalDiscount;
+    const discountedPrice = calcDiscountedPrice(course.price, applied);
+
+    await purchasedCourseRepo.create({
+      user: userId,
+      course: course._id.toString(),
+      basePrice: course.price,
+      priceAtPurchase: discountedPrice,
+      discountAmount: course.price - discountedPrice,
+      coupon: cart.coupon?.toString() ?? null,
+      payment: {
+        gateway: "manual",
+        transactionId: newTransaction.refId,
+      },
+    });
+  }
+
+  cart.items = [];
+  cart.subtotal = 0;
+  cart.discountAmount = 0;
+  cart.finalTotal = 0;
+  cart.coupon = undefined;
+
+  await cart.save();
+
+  return { transaction: newTransaction, wallet: updatedWallet };
 };
