@@ -13,6 +13,7 @@ import courseDiscountRouter from "./modules/discount/discount.route";
 import couponRouter from "./modules/coupen/coupon.route";
 import cartRouter from "./modules/cart/cart.route";
 import departmentRouter from "./modules/department/department.route";
+import ticketRouter from "./modules/ticket/ticket.route";
 
 import {errorHandler} from "./middlewares/errorHandler"
 
@@ -34,6 +35,7 @@ app.use("/course-discounts", courseDiscountRouter);
 app.use("/coupons", couponRouter);
 app.use("/carts", cartRouter);
 app.use("/departments", departmentRouter);
+app.use("/tickets", ticketRouter);
 
     
 // set error-handler

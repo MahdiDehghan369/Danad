@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import {
-    changeStatusDepartmentService,
+  changeStatusDepartmentService,
   createDepartmentService,
   editDepartmentService,
+  getAllDepartmentService,
   getDepartmentService,
+  getDepartmentsAdminService,
   removeDepartmentService,
 } from "./department.service";
 import { successResponse } from "../../utils/response";
@@ -88,3 +90,27 @@ export const changeStatusDepartment = async (
     next(error);
   }
 };
+
+export const getDepartmentsAdmin = async (req: Request , res: Response , next: NextFunction) => {
+    try {
+
+        const result = await getDepartmentsAdminService(req.query);
+
+        return successResponse(res , 200 , "Get successfully" , result)
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getAllDepartment = async (req: Request , res: Response , next: NextFunction) => {
+    try {
+
+        const result = await getAllDepartmentService()
+
+        return successResponse(res, 200 , "Get all departments successfully" , result)
+        
+    } catch (error) {
+        next(error)
+    }
+}

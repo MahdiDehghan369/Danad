@@ -43,3 +43,31 @@ export const departmentIdValidator = yup.object().shape({
     .matches(/^[0-9a-fA-F]{24}$/, "Invalid department ID format"),
 });
 
+export const querySchema = yup.object({
+  page: yup
+    .number()
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : Number(originalValue)
+    )
+    .min(0, "Page must be greater than or equal to 0")
+    .optional(),
+
+  limit: yup
+    .number()
+    .transform((value, originalValue) =>
+      originalValue === "" ? undefined : Number(originalValue)
+    )
+    .min(1, "Limit must be greater than or equal to 1")
+    .optional(),
+
+  isActive: yup
+    .boolean()
+    .transform((value, originalValue) => {
+      if (typeof originalValue === "string") {
+        if (originalValue.toLowerCase() === "true") return true;
+        if (originalValue.toLowerCase() === "false") return false;
+      }
+      return value;
+    })
+    .optional(),
+});

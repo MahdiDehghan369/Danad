@@ -1,6 +1,6 @@
 import { AppError } from "../../utils/appError";
 import { slugify } from "../../utils/slugify";
-import { departmentRepo, ICreateDepartment, IEditDepartment } from "./department.repo";
+import { departmentRepo, ICreateDepartment, IEditDepartment, IQuery } from "./department.repo";
 
 export const createDepartmentService = async(data: ICreateDepartment) => {
     data.slug = slugify(data.slug)
@@ -58,4 +58,20 @@ export const changeStatusDepartmentService = async (departmentId: string) => {
     const updatedDepartment = await departmentRepo.findOneAndUpdate({_id: departmentId} , {isActive})
 
     return {department: updatedDepartment}
+}
+
+export const getDepartmentsAdminService = async (query : IQuery) => {
+
+    const departments = await departmentRepo.find(query)
+
+    return departments
+
+}
+
+export const getAllDepartmentService = async () => {
+
+    const department = await departmentRepo.findAll()
+
+    return department
+
 }
