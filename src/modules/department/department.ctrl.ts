@@ -1,50 +1,90 @@
 import { NextFunction, Request, Response } from "express";
-import { createDepartmentService, editDepartmentService, removeDepartmentService } from "./department.service";
+import {
+    changeStatusDepartmentService,
+  createDepartmentService,
+  editDepartmentService,
+  getDepartmentService,
+  removeDepartmentService,
+} from "./department.service";
 import { successResponse } from "../../utils/response";
 
-export const createDepartment = async(req: Request , res: Response , next: NextFunction) => {
-    try {
+export const createDepartment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const data = req.body;
 
-        const data = req.body
+    const result = await createDepartmentService(data);
 
-        const result = await createDepartmentService(data)
+    return successResponse(res, 200, "Department created successfully", result);
+  } catch (error) {
+    next(error);
+  }
+};
 
-        return successResponse(res, 200 , "Department created successfully", result)
-        
-    } catch (error) {
-        next(error)
-    }
-}
+export const editDepartment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const data = req.body;
+    const departmentId = req.params.departmentId;
 
-export const editDepartment = async(req: Request , res: Response , next: NextFunction) => {
-    try {
+    const result = await editDepartmentService(departmentId, data);
 
-        const data = req.body
-        const departmentId = req.params.departmentId
+    return successResponse(res, 200, "Department updated successfully", result);
+  } catch (error) {
+    next(error);
+  }
+};
 
-        const result = await editDepartmentService(departmentId , data);
+export const removeDepartment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const departmentId = req.params.departmentId;
 
-        return successResponse(res, 200, "Department updated successfully" , result)
-        
-    } catch (error) {
-        next(error)
-    }
-}
+    const result = await removeDepartmentService(departmentId);
 
-export const removeDepartment = async (req: Request , res: Response , next: NextFunction) => {
-    try {
-        
-         const departmentId = req.params.departmentId;
+    return successResponse(res, 200, "Department removed successfully");
+  } catch (error) {
+    next(error);
+  }
+};
 
-         const result = await removeDepartmentService(departmentId);
+export const getDepartment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const departmentId = req.params.departmentId;
 
-         return successResponse(
-           res,
-           200,
-           "Department removed successfully"
-         );
+    const result = await getDepartmentService(departmentId);
 
-    } catch (error) {
-        next(error)
-    }
-}
+    return successResponse(res, 200, "Get info successfully", result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changeStatusDepartment = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const departmentId = req.params.departmentId;
+
+    const result = await changeStatusDepartmentService(departmentId);
+
+    return successResponse(res, 200, "status changed successfully", result);
+  } catch (error) {
+    next(error);
+  }
+};

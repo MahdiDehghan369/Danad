@@ -39,3 +39,23 @@ export const removeDepartmentService = async (departmentId: string) => {
 
     await departmentRepo.deleteOne({_id: departmentId})
 }
+
+export const getDepartmentService = async (departmentId: string) => {
+    const department = await departmentRepo.findOne({_id: departmentId})
+
+    if(!department) throw new AppError("Department not found" , 404)
+
+    return {department}
+}
+
+export const changeStatusDepartmentService = async (departmentId: string) => {
+    const department = await departmentRepo.findOne({_id: departmentId})
+
+    if(!department) throw new AppError("Department not found" , 404)
+
+    const isActive = !department.isActive
+
+    const updatedDepartment = await departmentRepo.findOneAndUpdate({_id: departmentId} , {isActive})
+
+    return {department: updatedDepartment}
+}

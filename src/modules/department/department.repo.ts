@@ -19,6 +19,6 @@ export interface IEditDepartment {
 export const departmentRepo = {
     create: async(data: ICreateDepartment) : Promise<IDepartment> => await departmentModel.create(data),
     findOne: async(condition: object) : Promise<IDepartment | null> => await departmentModel.findOne(condition),
-    findOneAndUpdate: async(condition: object , data: IEditDepartment) : Promise<IDepartment | null> => await departmentModel.findOneAndUpdate(condition , data , {new: true}),
+    findOneAndUpdate: async(condition: object , data: Partial<IEditDepartment>) : Promise<IDepartment | null> => await departmentModel.findOneAndUpdate(condition , data , {new: true}),
     deleteOne: async (condition: object) : Promise<DeleteResult> => await departmentModel.deleteOne(condition)
 }
