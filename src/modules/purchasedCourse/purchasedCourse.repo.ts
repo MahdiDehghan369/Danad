@@ -1,3 +1,4 @@
+import { populate } from "dotenv";
 import purchasedCourseModel, { IPurchasedCourse } from "./purchasedCourse.model";
 
 export interface ICreatePurchasedCourse {
@@ -14,5 +15,11 @@ export interface ICreatePurchasedCourse {
 }
 
 export const purchasedCourseRepo = {
-    create: async (data: ICreatePurchasedCourse) : Promise<IPurchasedCourse> => await purchasedCourseModel.create(data)
-}
+  create: async (data: ICreatePurchasedCourse): Promise<IPurchasedCourse> =>
+    await purchasedCourseModel.create(data),
+  find: async (condition: object): Promise<IPurchasedCourse[] | []> =>
+    await purchasedCourseModel
+      .find(condition)
+      .select("-__v -payment -user")
+      .populate({path: "course" , select: "-__v" , populate: {path: "teacher" , select: "fullname username avatar"}}),
+};

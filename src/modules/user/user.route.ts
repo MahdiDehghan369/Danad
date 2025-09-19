@@ -5,6 +5,7 @@ import {
   changeUserRole,
   editUserInfo,
   getActiveAccounts,
+  getUserCourses,
   getUserInfo,
   getUsers,
   removeAcount,
@@ -57,6 +58,10 @@ router
   .route("/accounts/:accountId")
   .delete(authMiddleware, paramValidator(accountIdValidator), removeAcount);
 
+
+  router.route("/courses").get(authMiddleware, getUserCourses);
+
+
 router
   .route("/:userId")
   .delete(
@@ -81,5 +86,6 @@ router
     bodyValidator(userRoleValidator),
     changeUserRole
   );
+
 
 export default router;

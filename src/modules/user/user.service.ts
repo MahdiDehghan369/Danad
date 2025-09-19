@@ -6,6 +6,7 @@ import { IEditUserInfo, IGetUsersQuery, userRepo } from "./user.repo";
 import bcrypt from "bcrypt";
 import fs from "fs";
 import { refreshTokenRepo } from "../refreshToken/refresh.repo";
+import { purchasedCourseRepo } from "../purchasedCourse/purchasedCourse.repo";
 
 export const changePasswordService = async (
   userId: string,
@@ -201,4 +202,16 @@ export const removeAllAccountsService = async (userId: string) => {
   await Promise.all(
     accounts.map((acc) => refreshTokenRepo.removeById(String(acc._id)))
   );
+}
+
+export const getUserCoursesService = async (userId: string) =>{
+
+  const user = await userRepo.findById(userId)
+
+  if(!user) throw new AppError("User not found" , 404)
+
+  const courses = await purchasedCourseRepo.find({user: userId})
+
+  return {courses}
+
 }
