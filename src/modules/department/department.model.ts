@@ -1,6 +1,7 @@
 import { Schema, model, Types } from "mongoose";
 
 export interface IDepartment{
+  _id: Types.ObjectId,
   name: string; 
   slug: string; 
   description?: string; 
