@@ -223,7 +223,9 @@ export const getUserTicketsServie = async (userId : string , query: IQueryFindTi
 
   if(!user) throw new AppError("User not found" , 404)
 
-  const tickets = await ticketRepo.find(userId , query)
+  query.user = userId
+
+  const tickets = await ticketRepo.find(query)
 
   return tickets
 

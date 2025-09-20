@@ -3,6 +3,7 @@ import {
   closeTicketService,
   createTicketService,
   getTicketService,
+  getTicketsForAdminService,
   removeTicketService,
   sendMessageTicketService,
 } from "./ticket.service";
@@ -76,6 +77,18 @@ export const removeTicket = async (req: ICustomRequest , res: Response , next: N
         await removeTicketService(req.params.ticketId , req.user?._id as string)
 
         return successResponse(res , 200 , "Ticket removed successfully")
+        
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const getTicketsForAdmin = async (req: Request , res: Response , next: NextFunction) => {
+    try {
+
+        const result = await getTicketsForAdminService(req.query)
+
+        return successResponse(res, 200 , "Get successfully" , result)
         
     } catch (error) {
         next(error)

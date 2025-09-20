@@ -2,7 +2,7 @@ import { Types } from "mongoose";
 import { AppError } from "../../utils/appError";
 import { departmentRepo } from "../department/department.repo";
 import { userRepo } from "../user/user.repo";
-import { ICreateTicket, IMessageTicket, ticketRepo } from "./ticket.repo";
+import { ICreateTicket, IMessageTicket, IQueryFindTikets, ticketRepo } from "./ticket.repo";
 
 export const createTicketService = async (data: ICreateTicket) => {
   const user = await userRepo.findById(data.user);
@@ -102,3 +102,11 @@ export const removeTicketService = async (ticketId: string, userId: string) => {
 
   await ticketRepo.deleteOne({_id: ticketId})
 };
+
+export const getTicketsForAdminService = async(query: IQueryFindTikets) => {
+
+  const tickets = await ticketRepo.find(query)
+
+  return tickets
+
+}

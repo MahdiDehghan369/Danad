@@ -32,11 +32,11 @@ export const ticketRepo = {
       .populate("user", "fullname username email avatar"),
   deleteOne: async (condition: object): Promise<DeleteResult> =>
     await ticketModel.deleteOne(condition),
-  find: async ( user?: string ,query?: IQueryFindTikets) => {
+  find: async (query?: IQueryFindTikets) => {
     let filterObj: IQueryFindTikets = {};
 
-    if(user){
-      filterObj.user = user
+    if(query?.user){
+      filterObj.user = query.user
     }
 
     if (query?.department) {
