@@ -40,12 +40,12 @@ export const departmentRepo = {
       filterObj.isActive = query.isActive;
     }
 
-    const page = query?.page ? query.page : 0;
-    const limit = query?.limit ? query.limit : 10;
+  const limit = query?.limit && query.limit > 0 ? query.limit : 10;
+  const page = query?.page && query.page > 0 ? query.page : 1;
 
     const departments = await departmentModel
       .find(filterObj)
-      .skip(page)
+      .skip((page - 1) * limit)
       .limit(limit)
       .sort({ createdAt: -1 });
 

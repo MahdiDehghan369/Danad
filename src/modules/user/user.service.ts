@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import fs from "fs";
 import { refreshTokenRepo } from "../refreshToken/refresh.repo";
 import { purchasedCourseRepo } from "../purchasedCourse/purchasedCourse.repo";
+import { IQueryFindTikets, ticketRepo } from "../ticket/ticket.repo";
 
 export const changePasswordService = async (
   userId: string,
@@ -213,5 +214,17 @@ export const getUserCoursesService = async (userId: string) =>{
   const courses = await purchasedCourseRepo.find({user: userId})
 
   return {courses}
+
+}
+
+export const getUserTicketsServie = async (userId : string , query: IQueryFindTikets) => {
+
+  const user = await userRepo.findById(userId)
+
+  if(!user) throw new AppError("User not found" , 404)
+
+  const tickets = await ticketRepo.find(userId , query)
+
+  return tickets
 
 }

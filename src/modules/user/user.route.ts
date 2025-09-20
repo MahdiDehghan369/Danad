@@ -8,6 +8,7 @@ import {
   getUserCourses,
   getUserInfo,
   getUsers,
+  getUserTickets,
   removeAcount,
   removeAllAccounts,
   removeProfile,
@@ -20,6 +21,7 @@ import {
   changePasswordValidator,
   editUserInfoValidator,
   getUsersQueryValidator,
+  queryFindTicketsSchema,
   userIdValidator,
   userRoleValidator,
 } from "./user.validator";
@@ -60,6 +62,13 @@ router
 
 
   router.route("/courses").get(authMiddleware, getUserCourses);
+  router
+    .route("/tickets")
+    .get(
+      authMiddleware,
+      queryValidator(queryFindTicketsSchema),
+      getUserTickets
+    );
 
 
 router

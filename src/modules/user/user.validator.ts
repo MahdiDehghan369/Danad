@@ -50,11 +50,42 @@ export const userRoleValidator = yup.object().shape({
     .required("User role is required"),
 });
 
-
 export const getUsersQueryValidator = yup.object({
-  role: yup.string().oneOf(["admin", "teacher" , "student"]).notRequired(),
+  role: yup.string().oneOf(["admin", "teacher", "student"]).notRequired(),
 
   limit: yup.number().integer().min(1).max(100).default(10),
 
   page: yup.number().integer().min(1).default(1),
+});
+
+const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+
+export const queryFindTicketsSchema = yup.object({
+  user: yup
+    .string()
+    .matches(objectIdRegex, "User must be a valid ObjectId")
+    .optional(),
+  department: yup
+    .string()
+    .matches(objectIdRegex, "Department must be a valid ObjectId")
+    .optional(),
+  status: yup
+    .mixed<"open" | "pending" | "closed" | "answered">()
+    .oneOf(
+      ["open", "pending", "closed", "answered"],
+      "Status must be one of: open, pending, closed, answered"
+    )
+    .optional(),
+  page: yup
+    .number()
+    .typeError("Page must be a number")
+    .integer("Page must be an integer")
+    .positive("Page must be greater than 0")
+    .optional(),
+  limit: yup
+    .number()
+    .typeError("Limit must be a number")
+    .integer("Limit must be an integer")
+    .positive("Limit must be greater than 0")
+    .optional(),
 });

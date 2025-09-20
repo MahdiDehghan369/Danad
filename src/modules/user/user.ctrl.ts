@@ -8,6 +8,7 @@ import {
   getUserCoursesService,
   getUserInfoService,
   getUsersService,
+  getUserTicketsServie,
   removeAccountService,
   removeAllAccountsService,
   removeProfileService,
@@ -225,3 +226,16 @@ export const getUserCourses = async (
     next(error);
   }
 };
+
+export const getUserTickets = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const result = await getUserTicketsServie(req.user?._id as string , req.query)
+
+    return successResponse(res, 200 , "Get successfully" , result)
+
+    
+  } catch (error) {
+    next(error)
+  }
+}
