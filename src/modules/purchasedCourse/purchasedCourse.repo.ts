@@ -22,4 +22,5 @@ export const purchasedCourseRepo = {
       .find(condition)
       .select("-__v -payment -user")
       .populate({path: "course" , select: "-__v" , populate: {path: "teacher" , select: "fullname username avatar"}}),
+  findOne: async (condition: object) : Promise<IPurchasedCourse | null> => await purchasedCourseModel.findOne(condition)
 };
