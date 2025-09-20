@@ -1,4 +1,4 @@
-import mongoose , {Document , Schema , model} from "mongoose"
+import mongoose , {Document , Schema , Types, model} from "mongoose"
 import bcrypt from "bcrypt"
 
 export type UserRole = "student" | "teacher" | "admin"
