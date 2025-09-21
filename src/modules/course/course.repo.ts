@@ -18,9 +18,16 @@ export interface ICreateCourseData {
 export const courseRepo = {
   create: async (data: ICreateCourseData): Promise<ICourse> =>
     await courseModel.create(data),
+  find: async (filter: object) => {
+    return courseModel.find(filter);
+  },
   findOne: async (condition: object): Promise<ICourse | null> =>
     await courseModel.findOne(condition),
-  findByIdAndUpdate: async (courseId: string, data: object) : Promise<ICourse | null> =>
-    await courseModel.findByIdAndUpdate(courseId, data , {new: true}),
-  deleteOne: async(condition: object) : Promise<DeleteResult> => await courseModel.deleteOne(condition)
+  findByIdAndUpdate: async (
+    courseId: string,
+    data: object
+  ): Promise<ICourse | null> =>
+    await courseModel.findByIdAndUpdate(courseId, data, { new: true }),
+  deleteOne: async (condition: object): Promise<DeleteResult> =>
+    await courseModel.deleteOne(condition),
 };

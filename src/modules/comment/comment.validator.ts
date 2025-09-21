@@ -38,3 +38,24 @@ export const statusCommentSchema = yup.object({
       "Status must be either 'approved' or 'rejected'"
     ),
 });
+
+export const commentFilterSchema = yup.object({
+  status: yup.string().oneOf(["pending", "approved", "rejected"]).optional(),
+
+  course: yup
+    .string()
+    .matches(objectIdRegex, "Course must be a valid MongoDB ObjectId")
+    .optional(),
+
+  page: yup
+    .number()
+    .integer("Page must be an integer")
+    .min(1, "Page must be at least 1")
+    .optional(),
+
+  limit: yup
+    .number()
+    .integer("Limit must be an integer")
+    .min(1, "Limit must be at least 1")
+    .optional(),
+});

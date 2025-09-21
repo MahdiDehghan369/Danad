@@ -1,5 +1,6 @@
-import { DeleteResult } from "mongoose";
+import mongoose, { DeleteResult, FilterQuery } from "mongoose";
 import courseCommentModel, { ICourseComment } from "./comment.model";
+import { AppError } from "../../utils/appError";
 
 export interface ICreateComment {
   user: string;
@@ -31,4 +32,53 @@ export const commentRepo = {
 
     return result;
   },
-};
+  find: async (
+    filter: FilterQuery<ICourseComment>,
+    page: number,
+    limit: number
+  ) => {
+    const skip = (page - 1) * limit;
+    const comments = await courseCommentModel
+      .find(filter)
+      .populate("user", "name email")
+      .populate("course", "title teacher")
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await courseCommentModel.countDocuments(filter);
+
+    return { comments, total, page, limit };
+  },
+  findTreeByCourse : async (courseId: string) => {
+  const courseObjectId = new mongoose.Types.ObjectId(courseId);
+
+  const comments = await courseCommentModel.aggregate([
+    {
+      $match: {
+        course: courseObjectId,
+        parentComment: null,
+      },
+    },
+    {
+      $lookup: {
+        from: courseCommentModel.collection.name, 
+        localField: "_id",
+        foreignField: "parentComment",
+        as: "children",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "user",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    { $unwind: "$user" },
+    { $sort: { createdAt: -1 } },
+  ]);
+
+  return comments;
+}};

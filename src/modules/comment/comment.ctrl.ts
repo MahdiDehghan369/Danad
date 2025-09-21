@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { changeStatusCommentService, createCommentService, dislikeCommentServie, likeCommentServie, removeCommentService } from "./comment.service";
+import { changeStatusCommentService, createCommentService, dislikeCommentServie, getCommentsService, likeCommentServie, removeCommentService } from "./comment.service";
 import { successResponse } from "../../utils/response";
 
 export const createComment = async(req: ICustomRequest , res: Response , next: NextFunction) => {
@@ -72,3 +72,17 @@ export const removeComment = async (req: ICustomRequest , res: Response , next: 
         next(error)
     }
 }
+
+export const getComments = async (req: ICustomRequest, res: Response , next: NextFunction) => {
+  const userId = req.user?._id as string;
+  const { status, course, page, limit } = req.query;
+
+  const result = await getCommentsService(userId, {
+    status: status as string,
+    course: course as string,
+    page: page ? Number(page) : 1,
+    limit: limit ? Number(limit) : 10,
+  });
+
+  return successResponse(res, 200, "Comments fetched successfully", result);
+};

@@ -179,3 +179,27 @@ export const removeCommentService = async (userId: string , commentId: string) =
 
 
 }
+
+export const getCommentsService = async (
+  userId: string,
+  filters: { status?: string; course?: string; page?: number; limit?: number }
+) => {
+  const user = await userRepo.findById(userId);
+  if (!user) throw new AppError("User not found", 404);
+
+  const { status, course, page = 1, limit = 10 } = filters;
+
+  let filterObj: any = {};
+  if (status) filterObj.status = status;
+  if (course) filterObj.course = course;
+
+  if (user.role === "teacher") {
+    const teacherCourses = await courseRepo.find({ teacher: user._id });
+    const teacherCourseIds = teacherCourses.map((c: any) => c._id);
+    filterObj.course = { $in: teacherCourseIds };
+  } else if (user.role !== "admin") {
+    throw new AppError("You do not have permission to view comments", 403);
+  }
+
+  return await commentRepo.find(filterObj, page, limit);
+};
