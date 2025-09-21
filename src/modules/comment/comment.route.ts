@@ -1,12 +1,25 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
-import { changeStatusComment, createComment, dislikeComment, getComments, likeComment, removeComment } from "./comment.ctrl";
+import {
+  changeStatusComment,
+  createComment,
+  dislikeComment,
+  getComment,
+  getComments,
+  likeComment,
+  removeComment,
+} from "./comment.ctrl";
 import { bodyValidator } from "../../middlewares/bodyValidator";
-import { commentFilterSchema, commentIdValidator, createCommentSchema, statusCommentSchema } from "./comment.validator";
+import {
+  commentFilterSchema,
+  commentIdValidator,
+  createCommentSchema,
+  statusCommentSchema,
+} from "./comment.validator";
 import { paramValidator } from "../../middlewares/paramValidator";
 import { checkRole } from "../../middlewares/checkRole";
 import { queryValidator } from "../../middlewares/queryValidator";
-const router = Router()
+const router = Router();
 
 router
   .route("/")
@@ -18,7 +31,20 @@ router
     getComments
   );
 
-router.route("/:commentId").delete(authMiddleware , checkRole(["admin" , "teacher"]) , paramValidator(commentIdValidator) , removeComment)
+router
+  .route("/:commentId")
+  .delete(
+    authMiddleware,
+    checkRole(["admin", "teacher"]),
+    paramValidator(commentIdValidator),
+    removeComment
+  )
+  .get(
+    authMiddleware,
+    checkRole(["admin", "teacher"]),
+    paramValidator(commentIdValidator),
+    getComment
+  );
 
 router
   .route("/:commentId/like")
@@ -38,5 +64,4 @@ router
     changeStatusComment
   );
 
-
-export default router
+export default router;

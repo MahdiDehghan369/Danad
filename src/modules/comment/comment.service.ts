@@ -78,7 +78,10 @@ export const likeCommentServie = async (userId: string, commentId: string) => {
   return { comment };
 };
 
-export const dislikeCommentServie = async (userId: string, commentId: string) => {
+export const dislikeCommentServie = async (
+  userId: string,
+  commentId: string
+) => {
   const user = await userRepo.findById(userId);
 
   if (!user) throw new AppError("User not found", 404);
@@ -113,72 +116,72 @@ export const dislikeCommentServie = async (userId: string, commentId: string) =>
   return { comment };
 };
 
-export const changeStatusCommentService = async (userId: string , commentId: string , status: "approved" | "rejected") => {
+export const changeStatusCommentService = async (
+  userId: string,
+  commentId: string,
+  status: "approved" | "rejected"
+) => {
+  const user = await userRepo.findById(userId);
 
-    const user = await userRepo.findById(userId)
+  if (!user) throw new AppError("User not found", 404);
 
-    if(!user) throw new AppError("User not found" , 404)
+  const comment = await commentRepo.findOne({ _id: commentId });
 
-    const comment = await commentRepo.findOne({_id: commentId})
+  if (!comment) throw new AppError("Comment not found", 404);
 
-    if(!comment) throw new AppError("Comment not found" , 404)
+  const course = await courseRepo.findOne({ _id: comment.course });
 
-    const course = await courseRepo.findOne({_id:comment.course})
+  if (!course) throw new AppError("Course not found", 404);
 
-    if(!course) throw new AppError("Course not found" , 404)
+  if (
+    user.role !== "admin" &&
+    !(
+      user.role === "teacher" && course.teacher.toString() === userId.toString()
+    )
+  ) {
+    throw new AppError(
+      "You do not have permission to approve/reject this comment",
+      403
+    );
+  }
 
-    if (
-      user.role !== "admin" && 
-      !(
-        user.role === "teacher" &&
-        course.teacher.toString() === userId.toString()
-      )
-    ) {
-      throw new AppError(
-        "You do not have permission to approve/reject this comment",
-        403
-      );
-    }
+  comment.status = status;
 
+  await comment.save();
 
-    comment.status = status
+  return { comment };
+};
 
-    await comment.save()
+export const removeCommentService = async (
+  userId: string,
+  commentId: string
+) => {
+  const user = await userRepo.findById(userId);
 
-    return {comment}
-}
+  if (!user) throw new AppError("User not found", 404);
 
-export const removeCommentService = async (userId: string , commentId: string) => {
-     const user = await userRepo.findById(userId);
+  const comment = await commentRepo.findOne({ _id: commentId });
 
-     if (!user) throw new AppError("User not found", 404);
+  if (!comment) throw new AppError("Comment not found", 404);
 
-     const comment = await commentRepo.findOne({ _id: commentId });
+  const course = await courseRepo.findOne({ _id: comment.course });
 
-     if (!comment) throw new AppError("Comment not found", 404);
+  if (!course) throw new AppError("Course not found", 404);
 
-     const course = await courseRepo.findOne({ _id: comment.course });
+  if (
+    user.role !== "admin" &&
+    !(
+      user.role === "teacher" && course.teacher.toString() === userId.toString()
+    )
+  ) {
+    throw new AppError(
+      "You do not have permission to remove this comment",
+      403
+    );
+  }
 
-     if (!course) throw new AppError("Course not found", 404);
-
-     if (
-       user.role !== "admin" &&
-       !(
-         user.role === "teacher" &&
-         course.teacher.toString() === userId.toString()
-       )
-     ) {
-       throw new AppError(
-         "You do not have permission to remove this comment",
-         403
-       );
-     }
-
-
-    await commentRepo.deleteOne({_id: commentId})
-
-
-}
+  await commentRepo.deleteOne({ _id: commentId });
+};
 
 export const getCommentsService = async (
   userId: string,
@@ -202,4 +205,34 @@ export const getCommentsService = async (
   }
 
   return await commentRepo.find(filterObj, page, limit);
+};
+
+export const getCommentService = async (userId: string, commentId: string) => {
+  const user = await userRepo.findById(userId);
+
+  if (!user) throw new AppError("User not found", 404);
+
+  const comment = await commentRepo.findOne({ _id: commentId });
+
+  if (!comment) throw new AppError("Comment not found", 404);
+
+  const course = await courseRepo.findOne({ _id: comment.course });
+
+  if (!course) throw new AppError("Course not found", 404);
+
+  if (
+    user.role !== "admin" &&
+    !(
+      user.role === "teacher" && course.teacher.toString() === userId.toString()
+    )
+  ) {
+    throw new AppError(
+      "You do not have permission to get this comment",
+      403
+    );
+  }
+
+
+  return {comment}
+
 };

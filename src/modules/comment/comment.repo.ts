@@ -14,7 +14,7 @@ export const commentRepo = {
   create: async (data: ICreateComment): Promise<ICourseComment> =>
     await courseCommentModel.create(data),
   findOne: async (condition: object): Promise<ICourseComment | null> =>
-    await courseCommentModel.findOne(condition),
+    await courseCommentModel.findOne(condition).populate("user" , "fullname username avatar").populate("course" , "-__v"),
   deleteOne: async (condition: object): Promise<DeleteResult> => {
     const comment = await courseCommentModel.findOne(condition);
     if (!comment) throw new Error("Comment not found");
