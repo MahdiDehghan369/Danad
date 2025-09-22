@@ -11,4 +11,5 @@ export interface ICreateSection {
 
 export const sectionRepo = {
   create: async (data: ICreateSection): Promise<ISection> => await sectionModel.create(data),
+  findOne: async (condition: object) : Promise<ISection | null> => await sectionModel.findOne(condition)
 };

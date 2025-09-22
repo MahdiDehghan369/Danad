@@ -28,7 +28,7 @@ import {
 import { checkRole } from "../../middlewares/checkRole";
 import { paramValidator } from "../../middlewares/paramValidator";
 import { queryValidator } from "../../middlewares/queryValidator";
-import uploadPhoto from "../../middlewares/multer";
+import {uploadPhoto} from "../../middlewares/multer";
 
 const router = Router();
 

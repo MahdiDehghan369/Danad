@@ -1,35 +1,24 @@
 import { Schema, model, Document, Types } from "mongoose";
 
-export interface IResource {
-  name: string;
-  url: string;
-}
+
 
 export interface ISession extends Document {
   course: Types.ObjectId;
   section: Types.ObjectId;
   title: string;
   description?: string;
-  videoUrl: string;
+  videoUrl: string| null;
   videoDuration: number;
-  fileUrl?: string;
+  fileUrl: string | null;
   isFree: boolean;
   order: number;
   status: "draft" | "published";
-  resources: IResource[];
   createdBy: Types.ObjectId;
-  updatedBy?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const resourceSchema = new Schema<IResource>(
-  {
-    name: { type: String, required: true },
-    url: { type: String, required: true },
-  },
-  { _id: false }
-);
+
 
 const sessionSchema = new Schema<ISession>(
   {
@@ -76,16 +65,11 @@ const sessionSchema = new Schema<ISession>(
       enum: ["draft", "published"],
       default: "draft",
     },
-    resources: [resourceSchema],
     createdBy: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
-    },
-    updatedBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
+    }
   },
   { timestamps: true }
 );

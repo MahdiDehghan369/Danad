@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
 import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, removeCourse, removeCourseCover } from "./course.ctrl";
-import uploadPhoto from "../../middlewares/multer";
+import {uploadPhoto} from "../../middlewares/multer";
 import { bodyValidator } from "../../middlewares/bodyValidator";
 import { courseIdValidator, createCourseSchema, createSectionSchema, statusCourse, teacherIdValidator, updateCourseSchema } from "./course.validator";
 import { paramValidator } from "../../middlewares/paramValidator";
