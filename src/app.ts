@@ -15,6 +15,7 @@ import cartRouter from "./modules/cart/cart.route";
 import departmentRouter from "./modules/department/department.route";
 import ticketRouter from "./modules/ticket/ticket.route";
 import commentRouter from "./modules/comment/comment.route";
+import sectionRouter from "./modules/section/section.route";
 
 import {errorHandler} from "./middlewares/errorHandler"
 
@@ -38,6 +39,7 @@ app.use("/carts", cartRouter);
 app.use("/departments", departmentRouter);
 app.use("/tickets", ticketRouter);
 app.use("/comments", commentRouter);
+app.use("/sections", sectionRouter);
 
     
 // set error-handler

@@ -8,6 +8,7 @@ import fs from "fs"
 import { ICourse } from "./course.model";
 import mongoose from "mongoose";
 import { banRepo } from "../ban/ban.repo";
+import { ICreateSection, sectionRepo } from "../section/section.repo";
 
 type statusCourse = "completed" | "pending" | "draft";
 
@@ -156,4 +157,20 @@ export const removeCourseCoverService = async (courseId: string) => {
 
 
   await courseRepo.findByIdAndUpdate(courseId , {cover: null})
+}
+
+export const createSectionService = async (data: ICreateSection) => {
+
+  const course = await courseRepo.findOne({_id: data.course})
+
+  if(!course) throw new AppError("Course not found" , 404)
+
+  const user = await userRepo.findById(data.createdBy)
+
+  if(!user) throw new AppError("User not found" , 404)
+
+  const section = await sectionRepo.create(data)
+
+  return {section}
+
 }

@@ -1,5 +1,7 @@
 import * as yup from "yup";
 
+const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+
 export const createCourseSchema = yup.object().shape({
   title: yup
     .string()
@@ -84,8 +86,6 @@ export const updateCourseSchema = yup.object().shape({
   prerequisites: yup.array().of(yup.string()).notRequired(),
 });
 
-
-
 export const courseIdValidator = yup.object().shape({
   courseId: yup
     .string()
@@ -104,4 +104,30 @@ export const teacherIdValidator = yup.object().shape({
     .string()
     .required("Teacher ID is required")
     .matches(/^[0-9a-fA-F]{24}$/, "Invalid Teacher ID format"),
+});
+
+export const createSectionSchema = yup.object({
+  title: yup
+    .string()
+    .min(3, "Title must be at least 3 characters long")
+    .max(100, "Title must be at most 100 characters long")
+    .required("Title is required"),
+
+  description: yup
+    .string()
+    .max(500, "Description must be at most 500 characters")
+    .optional(),
+
+  order: yup
+    .number()
+    .min(1, "Order must be greater than 0")
+    .required("Order is required"),
+
+  status: yup
+    .mixed<"draft" | "published">()
+    .oneOf(
+      ["draft", "published"],
+      "Status must be either 'draft' or 'published'"
+    )
+    .required("Status is required"),
 });

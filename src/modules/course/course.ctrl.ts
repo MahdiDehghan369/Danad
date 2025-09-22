@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { changeStatusCourseService, changeTeacherCourseService, createCourseService, editCourseService, removeCourseCoverService, removeCourseService } from "./course.service";
+import { changeStatusCourseService, changeTeacherCourseService, createCourseService, createSectionService, editCourseService, removeCourseCoverService, removeCourseService } from "./course.service";
 import { successResponse } from "../../utils/response";
 import fs from "fs";
 import path from "path";
+import { ICustomRequest } from "../../middlewares/auth";
 
 export const createCourse = async (
   req: Request,
@@ -120,6 +121,25 @@ export const removeCourseCover = async (req: Request , res: Response , next: Nex
     await removeCourseCoverService(courseId)
 
     return successResponse(res, 200 , "Course's cover removed successfully")
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const createSection = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const userId= req.user?._id as string
+    const courseId = req.params.courseId
+
+    const data = req.body
+    data.course = courseId
+    data.createdBy = userId
+
+    const result = await createSectionService(data)
+
+    return successResponse(res, 200 , "Section created successfully" , result)
     
   } catch (error) {
     next(error)
