@@ -1,7 +1,8 @@
 import { NextFunction, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { createSessionService } from "./section.service";
+import { createSessionService, getSessionsService } from "./section.service";
 import { successResponse } from "../../utils/response";
+import { ISessionFilter } from "../session/session.repo";
 
 export const createSession = async (
   req: ICustomRequest,
@@ -24,3 +25,18 @@ export const createSession = async (
     next(error);
   }
 };
+
+
+export const getSessions = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const sectionId = req.params.sectionId
+
+    const result = await getSessionsService(sectionId , req.query)
+
+    return successResponse(res , 200 , "Get sessions successfully" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}

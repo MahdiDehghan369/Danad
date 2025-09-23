@@ -32,3 +32,21 @@ export const sectionIdValidator = yup.object().shape({
     .required("section ID is required")
     .matches(/^[0-9a-fA-F]{24}$/, "Invalid section ID format"),
 });
+
+export const sessionFilterSchema = yup.object({
+  status: yup.string().oneOf(["draft", "published"]).optional(),
+
+  isFree: yup.boolean().optional(),
+
+  page: yup
+    .number()
+    .integer("Page must be an integer")
+    .min(1, "Page must be at least 1")
+    .optional(),
+
+  limit: yup
+    .number()
+    .integer("Limit must be an integer")
+    .min(1, "Limit must be at least 1")
+    .optional()
+});

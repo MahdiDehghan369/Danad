@@ -1,6 +1,6 @@
 import path from "path";
 import { AppError } from "../../utils/appError";
-import { ICreateSession, sessionRepo } from "../session/session.repo";
+import { ICreateSession, ISessionFilter, sessionRepo } from "../session/session.repo";
 import { sectionRepo } from "./section.repo";
 import { userRepo } from "../user/user.repo";
 
@@ -29,6 +29,19 @@ export const createSessionService = async (
     fileUrl: videoUrl ? `/session-file/${archiveFileUrl}` : null,
   });
 
+  section.sessions.push(session._id)
+  section.save()
+
   return {session}
 
 };
+
+export const getSessionsService = async(sectionId: string , filters: ISessionFilter) => {
+  const section = sectionRepo.findOne({_id: sectionId})
+
+  if(!section) throw new AppError("Section not found" , 404)
+
+  const sessions = await sessionRepo.findAllBySection(sectionId, filters)
+
+  return sessions
+}

@@ -3,6 +3,7 @@ import { Schema, model, Document, Types } from "mongoose";
 
 
 export interface ISession extends Document {
+  _id: Types.ObjectId,
   course: Types.ObjectId;
   section: Types.ObjectId;
   title: string;
