@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { changeFreeSessionService, changeStatusSessionService, getSessionService, removeSessionService } from "./session.service";
+import { changeFreeSessionService, changeStatusSessionService, getSessionService, removeSessionService, watchSessionService } from "./session.service";
 import { successResponse } from "../../utils/response";
 
 export const getSession = async (req: ICustomRequest , res: Response, next: NextFunction) => {
@@ -54,6 +54,21 @@ export const changeFreeSession = async (req: ICustomRequest , res: Response , ne
 
         return successResponse(res, 200 , "IsFree changed successfully" , result)
 
+    } catch (error) {
+        next(error)
+    }
+}
+
+export const watchSession = async (req: ICustomRequest , res: Response, next: NextFunction) => {
+    try {
+
+        const sessionId = req.params.sessionId
+        const userId = req.user?._id as string
+
+        const result = await watchSessionService(sessionId , userId)
+
+        return successResponse(res, 200 , "Get successfully" , result)
+        
     } catch (error) {
         next(error)
     }
