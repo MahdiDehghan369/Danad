@@ -1,7 +1,7 @@
 import { AppError } from "../../utils/appError"
 import { purchasedCourseRepo } from "../purchasedCourse/purchasedCourse.repo"
 import { userRepo } from "../user/user.repo"
-import { sessionRepo } from "./session.repo"
+import { ISessionFilter, sessionRepo } from "./session.repo"
 
 export const getSessionService = async (sessionId: string) => {
 
@@ -65,5 +65,13 @@ export const watchSessionService = async (sessionId: string , userId: string) =>
     }
 
     return {session}
+
+}
+
+export const getAllSessionsService = async (filters : ISessionFilter) => {
+
+  const sessions = await sessionRepo.findAllSessions(filters)
+
+  return sessions
 
 }

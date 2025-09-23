@@ -3,10 +3,12 @@ import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
 import { paramValidator } from "../../middlewares/paramValidator";
 import { sessionFreeSchema, sessionIdValidator, sessionStatusSchema } from "./session.validator";
-import { changeFreeSession, changeStatusSession, getSession, removeSession, watchSession } from "./session.ctrl";
+import { changeFreeSession, changeStatusSession, getAllSessions, getSession, removeSession, watchSession } from "./session.ctrl";
 import { bodyValidator } from "../../middlewares/bodyValidator";
 
 const router = Router()
+
+router.route("/").get(authMiddleware, checkRole("teacher"), getAllSessions);
 
 router
   .route("/:sessionId")
@@ -39,5 +41,7 @@ router
   );
 
 router.route("/:sessionId/watch").get(authMiddleware, paramValidator(sessionIdValidator), watchSession)
+
+
 
 export default router

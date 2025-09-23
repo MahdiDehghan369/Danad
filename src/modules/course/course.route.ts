@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
-import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, removeCourse, removeCourseCover } from "./course.ctrl";
+import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, getAllSessionOfCourse, removeCourse, removeCourseCover } from "./course.ctrl";
 import {uploadPhoto} from "../../middlewares/multer";
 import { bodyValidator } from "../../middlewares/bodyValidator";
 import { courseIdValidator, createCourseSchema, createSectionSchema, statusCourse, teacherIdValidator, updateCourseSchema } from "./course.validator";
@@ -40,5 +40,9 @@ router
     bodyValidator(createSectionSchema),
     createSection
   );
+
+router
+  .route("/:courseId/sessions")
+  .get(paramValidator(courseIdValidator), getAllSessionOfCourse);
 
 export default router
