@@ -1,4 +1,4 @@
-import { DeleteResult } from "mongoose";
+import { DeleteResult, UpdateResult } from "mongoose";
 import sessionModel, { ISession } from "./session.model";
 
 export interface ISessionFilter {
@@ -93,5 +93,6 @@ export const sessionRepo = {
 
     return { sessions, total, page, limit };
   },
-  updateMany: async (condition: object , data: object) => await sessionModel.updateMany(condition , data)
+  updateMany: async (condition: object , data: object) => await sessionModel.updateMany(condition , data),
+  updateOne: async (condition: object , data: object): Promise<UpdateResult> => await sessionModel.updateOne(condition , data)
 };

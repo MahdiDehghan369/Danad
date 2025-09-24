@@ -7,14 +7,17 @@ import {
   changeStatusSection,
   createSession,
   editSection,
+  getAllSectionForTeacher,
   getSection,
   getSessions,
   removeSection,
+  removeSessionFromSection,
 } from "./section.ctrl";
 import { paramValidator } from "../../middlewares/paramValidator";
 import {
   createSessionSchema,
   editSectionSchema,
+  sectionFilterSchema,
   sectionIdValidator,
   sectionStatusSchema,
   sessionFilterSchema,
@@ -23,6 +26,15 @@ import { bodyValidator } from "../../middlewares/bodyValidator";
 import { queryValidator } from "../../middlewares/queryValidator";
 import { sessionIdValidator } from "../session/session.validator";
 const router = Router();
+
+router
+  .route("/")
+  .get(
+    authMiddleware,
+    checkRole("teacher"),
+    queryValidator(sectionFilterSchema),
+    getAllSectionForTeacher
+  );
 
 router
   .route("/:sectionId")
@@ -83,6 +95,13 @@ router
     paramValidator(sectionIdValidator),
     paramValidator(sessionIdValidator),
     addSessionToSection
+  )
+  .delete(
+    authMiddleware,
+    checkRole("teacher"),
+    paramValidator(sectionIdValidator),
+    paramValidator(sessionIdValidator),
+    removeSessionFromSection
   );
 
 export default router;

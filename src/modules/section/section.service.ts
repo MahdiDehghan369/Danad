@@ -5,7 +5,7 @@ import {
   ISessionFilter,
   sessionRepo,
 } from "../session/session.repo";
-import { IEditSection, sectionRepo } from "./section.repo";
+import { IEditSection, ISecionFilter, sectionRepo } from "./section.repo";
 import { userRepo } from "../user/user.repo";
 import { courseRepo } from "../course/course.repo";
 
@@ -127,17 +127,49 @@ export const addSessionToSectionService = async (
   const session = await sessionRepo.findOne({ _id: sessionId });
   if (!session) throw new AppError("Session not found", 404);
 
-  if (session.section?.toString() === sectionId.toString())
+  if (session.section?._id.toString() === sectionId.toString())
     throw new AppError("Session already belongs to this section", 409);
-
-  const sessionExistsInSection = section.sessions.some(
-    (s) => s.toString() === sessionId.toString()
-  );
-  if (sessionExistsInSection)
-    throw new AppError("Session already exists in this section", 409);
 
   section.sessions.push(session._id);
   session.section = section._id;
 
   await Promise.all([section.save(), session.save()]);
 };
+
+export const removeSessionFromSectionService = async (
+  sectionId: string,
+  sessionId: string
+) => {
+  const section = await sectionRepo.findOne({ _id: sectionId });
+
+  if (!section) throw new AppError("Section not found", 404);
+
+  const session = await sessionRepo.findOne({ _id: sessionId });
+
+  if (!session) throw new AppError("Session not found", 404);
+
+  const sessionExistsInSection = section.sessions.some(
+    (session) => session.toString() === sessionId.toString()
+  );
+  if (session.section._id.toString() === section._id.toString()) {
+    await sessionRepo.updateOne({ _id: sessionId }, { section: null });
+  }
+
+  if (!sessionExistsInSection) {
+    throw new AppError("Session not found in this section", 404);
+  }
+
+  section.sessions = section.sessions.filter(
+    (session) => session.toString() !== sessionId.toString()
+  );
+
+  await section.save();
+};
+
+export const getAllSectionForTeacherService = async (filters: ISecionFilter) => {
+
+  const sections = await sectionRepo.findAllSections(filters)
+
+  return sections
+
+}

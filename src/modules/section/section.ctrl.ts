@@ -5,9 +5,11 @@ import {
   changeStatusSectionService,
   createSessionService,
   editSectionService,
+  getAllSectionForTeacherService,
   getSectionService,
   getSessionsService,
   removeSectionService,
+  removeSessionFromSectionService,
 } from "./section.service";
 import { successResponse } from "../../utils/response";
 import { ISessionFilter } from "../session/session.repo";
@@ -135,3 +137,30 @@ export const addSessionToSection = async (
     next(error);
   }
 };
+
+export const removeSessionFromSection = async (req: ICustomRequest , res: Response, next: NextFunction) => {
+  try {
+
+    const sectionId = req.params.sectionId
+    const sessionId = req.params.sessionId
+
+    await removeSessionFromSectionService(sectionId , sessionId)
+
+    return successResponse(res, 200 , "Removed successfully")
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getAllSectionForTeacher = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const result = await getAllSectionForTeacherService(req.query)
+
+    return successResponse(res, 200 , "Get successfully" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}

@@ -93,3 +93,31 @@ export const editSectionSchema = yup.object({
       "Status must be either 'draft' or 'published'."
     ),
 });
+
+export const sectionFilterSchema = yup
+  .object({
+    course: yup
+      .string()
+      .optional()
+      .matches(objectIdRegex, "Course must be a valid MongoDB ObjectId"),
+
+    status: yup
+      .mixed<"draft" | "published">()
+      .optional()
+      .oneOf(
+        ["draft", "published"],
+        "Status must be either 'draft' or 'published'"
+      ),
+
+    page: yup
+      .number()
+      .optional()
+      .integer("Page must be an integer")
+      .min(1, "Page must be at least 1"),
+
+    limit: yup
+      .number()
+      .optional()
+      .integer("Limit must be an integer")
+      .min(1, "Limit must be at least 1"),
+  })
