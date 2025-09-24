@@ -1,8 +1,9 @@
 import path from "path";
 import { AppError } from "../../utils/appError";
 import { ICreateSession, ISessionFilter, sessionRepo } from "../session/session.repo";
-import { sectionRepo } from "./section.repo";
+import { IEditSection, sectionRepo } from "./section.repo";
 import { userRepo } from "../user/user.repo";
+import { courseRepo } from "../course/course.repo";
 
 export const createSessionService = async (
   files: { [fieldname: string]: Express.Multer.File[] },
@@ -45,3 +46,54 @@ export const getSessionsService = async(sectionId: string , filters: ISessionFil
 
   return sessions
 }
+
+export const getSectionService = async (sectionId: string) => {
+  const section = await sectionRepo.findOne({ _id: sectionId });
+
+  if (!section) throw new AppError("Section not found", 404);
+
+  const sessions = await Promise.all(
+    section.sessions.map((sessionId) =>
+      sessionRepo.findOne({ _id: sessionId, status: "published" })
+    )
+  );
+
+  return {
+    section: {
+      ...(section.toObject?.() ?? section),
+      sessions: sessions.filter((s) => s !== null),
+    },
+  };  
+
+};
+
+export const changeStatusSectionService = async(sectionId: string , status: "draft" | "published") => {
+
+  const section = await sectionRepo.findOne({_id: sectionId})
+
+  if(!section) throw new AppError("Section not found" , 404)
+
+  const updatedSection = await sectionRepo.findOneAndUpdate({_id: sectionId} , {status})
+
+  return {section: updatedSection}
+
+}
+
+export const editSectionService = async(sectionId: string , data: IEditSection) => {
+
+  const section = await sectionRepo.findOne({_id: sectionId})
+
+  if(!section) throw new AppError("Section not found", 404)
+
+  const course = await courseRepo.findOne({_id: data.course})
+
+  if(!course) throw new AppError("Course not found" , 404)
+
+  const updatedSection = await sectionRepo.findOneAndUpdate(
+    { _id: sectionId },
+    data
+  );
+  
+  return {section: updatedSection}
+
+} 

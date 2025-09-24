@@ -210,3 +210,31 @@ export const getAllSessionOfCourseServie = async (courseId: string) => {
 
   return result;
 };
+
+export const getAllSectionsOfCourseService = async (courseId: string) => {
+  const course = await courseRepo.findOne({ _id: courseId });
+
+  if (!course) throw new AppError("Course not found", 404);
+
+  const sections = await sectionRepo.findAll({
+    course: courseId,
+    status: "published",
+  });
+
+  const newSections = await Promise.all(
+    sections.map(async (section) => {
+      const sessions = await Promise.all(
+        section.sessions.map((sessionId) =>
+          sessionRepo.findOne({ _id: sessionId, status: "published" })
+        )
+      );
+
+      return {
+        ...(section.toObject?.() ?? section), 
+        sessions: sessions.filter((s) => s !== null),
+      };
+    })
+  );
+
+  return { sections: newSections };
+};
