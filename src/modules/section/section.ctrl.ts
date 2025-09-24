@@ -1,6 +1,14 @@
 import { NextFunction, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { changeStatusSectionService, createSessionService, editSectionService, getSectionService, getSessionsService, removeSectionService } from "./section.service";
+import {
+  addSessionToSectionService,
+  changeStatusSectionService,
+  createSessionService,
+  editSectionService,
+  getSectionService,
+  getSessionsService,
+  removeSectionService,
+} from "./section.service";
 import { successResponse } from "../../utils/response";
 import { ISessionFilter } from "../session/session.repo";
 
@@ -26,70 +34,104 @@ export const createSession = async (
   }
 };
 
-export const getSessions = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+export const getSessions = async (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    const sectionId = req.params.sectionId;
 
-    const sectionId = req.params.sectionId
+    const result = await getSessionsService(sectionId, req.query);
 
-    const result = await getSessionsService(sectionId , req.query)
-
-    return successResponse(res , 200 , "Get sessions successfully" , result)
-    
+    return successResponse(res, 200, "Get sessions successfully", result);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
-export const getSection = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+export const getSection = async (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    const sectionId = req.params.sectionId;
+    const result = await getSectionService(sectionId);
 
-    const sectionId = req.params.sectionId
-    const result = await getSectionService(sectionId)
-
-    return successResponse(res, 200, "Get section successfully" , result)
-    
+    return successResponse(res, 200, "Get section successfully", result);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
-export const changeStatusSection = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+export const changeStatusSection = async (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    const sectionId = req.params.sectionId;
 
-    const sectionId = req.params.sectionId
+    const result = await changeStatusSectionService(sectionId, req.body.status);
 
-    const result = await changeStatusSectionService(sectionId, req.body.status)
-
-    return successResponse(res, 200 , "Section status changed successfully" , result)
-    
+    return successResponse(
+      res,
+      200,
+      "Section status changed successfully",
+      result
+    );
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
-export const editSection = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+export const editSection = async (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    const sectionId = req.params.sectionId;
 
-    const sectionId = req.params.sectionId
+    const result = await editSectionService(sectionId, req.body);
 
-    const result = await editSectionService(sectionId , req.body)
-    
-    return successResponse(res, 200 , "Edited successfully" , result)
+    return successResponse(res, 200, "Edited successfully", result);
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
-export const removeSection = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+export const removeSection = async (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    const sectionId = req.params.sectionId;
 
-    const sectionId = req.params.sectionId
+    await removeSectionService(sectionId);
 
-    await removeSectionService(sectionId)
-
-    return successResponse(res, 200, "Section removed successfully")
-    
+    return successResponse(res, 200, "Section removed successfully");
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
+export const addSessionToSection = async (
+  req: ICustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const sectionId = req.params.sectionId;
+    const sessionId = req.params.sessionId;
+
+    await addSessionToSectionService(sectionId, sessionId)
+
+    return successResponse(res, 200, "Added successfully")
+
+  } catch (error) {
+    next(error);
+  }
+};

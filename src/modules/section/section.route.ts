@@ -1,13 +1,28 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
-import {uploadFile} from "../../middlewares/multer"
-import { changeStatusSection, createSession, editSection, getSection, getSessions, removeSection } from "./section.ctrl";
+import { uploadFile } from "../../middlewares/multer";
+import {
+  addSessionToSection,
+  changeStatusSection,
+  createSession,
+  editSection,
+  getSection,
+  getSessions,
+  removeSection,
+} from "./section.ctrl";
 import { paramValidator } from "../../middlewares/paramValidator";
-import { createSessionSchema, editSectionSchema, sectionIdValidator, sectionStatusSchema, sessionFilterSchema } from "./section.validator";
+import {
+  createSessionSchema,
+  editSectionSchema,
+  sectionIdValidator,
+  sectionStatusSchema,
+  sessionFilterSchema,
+} from "./section.validator";
 import { bodyValidator } from "../../middlewares/bodyValidator";
 import { queryValidator } from "../../middlewares/queryValidator";
-const router = Router()
+import { sessionIdValidator } from "../session/session.validator";
+const router = Router();
 
 router
   .route("/:sectionId")
@@ -17,7 +32,13 @@ router
     paramValidator(sectionIdValidator),
     bodyValidator(editSectionSchema),
     editSection
-  ).delete(authMiddleware , checkRole("teacher") , paramValidator(sectionIdValidator) , removeSection)
+  )
+  .delete(
+    authMiddleware,
+    checkRole("teacher"),
+    paramValidator(sectionIdValidator),
+    removeSection
+  );
 
 router
   .route("/:sectionId/sessions")
@@ -40,8 +61,9 @@ router
     getSessions
   );
 
-
-router.route("/:sectionId").get(authMiddleware , paramValidator(sectionIdValidator) , getSection)
+router
+  .route("/:sectionId")
+  .get(authMiddleware, paramValidator(sectionIdValidator), getSection);
 
 router
   .route("/:sectionId/status")
@@ -53,5 +75,14 @@ router
     changeStatusSection
   );
 
+router
+  .route("/:sectionId/sessions/:sessionId")
+  .post(
+    authMiddleware,
+    checkRole("teacher"),
+    paramValidator(sectionIdValidator),
+    paramValidator(sessionIdValidator),
+    addSessionToSection
+  );
 
-export default router
+export default router;

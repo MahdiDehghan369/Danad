@@ -116,3 +116,28 @@ export const removeSectionService = async (sectionId: string) => {
 
   await sectionRepo.deleteOne({ _id: sectionId });
 };
+
+export const addSessionToSectionService = async (
+  sectionId: string,
+  sessionId: string
+) => {
+  const section = await sectionRepo.findOne({ _id: sectionId });
+  if (!section) throw new AppError("Section not found", 404);
+
+  const session = await sessionRepo.findOne({ _id: sessionId });
+  if (!session) throw new AppError("Session not found", 404);
+
+  if (session.section?.toString() === sectionId.toString())
+    throw new AppError("Session already belongs to this section", 409);
+
+  const sessionExistsInSection = section.sessions.some(
+    (s) => s.toString() === sessionId.toString()
+  );
+  if (sessionExistsInSection)
+    throw new AppError("Session already exists in this section", 409);
+
+  section.sessions.push(session._id);
+  session.section = section._id;
+
+  await Promise.all([section.save(), session.save()]);
+};
