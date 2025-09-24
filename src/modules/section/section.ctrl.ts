@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { changeStatusSectionService, createSessionService, editSectionService, getSectionService, getSessionsService } from "./section.service";
+import { changeStatusSectionService, createSessionService, editSectionService, getSectionService, getSessionsService, removeSectionService } from "./section.service";
 import { successResponse } from "../../utils/response";
 import { ISessionFilter } from "../session/session.repo";
 
@@ -85,7 +85,9 @@ export const removeSection = async (req: ICustomRequest , res: Response , next: 
 
     const sectionId = req.params.sectionId
 
-    
+    await removeSectionService(sectionId)
+
+    return successResponse(res, 200, "Section removed successfully")
     
   } catch (error) {
     next(error)

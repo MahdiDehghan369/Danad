@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
 import {uploadFile} from "../../middlewares/multer"
-import { changeStatusSection, createSession, editSection, getSection, getSessions } from "./section.ctrl";
+import { changeStatusSection, createSession, editSection, getSection, getSessions, removeSection } from "./section.ctrl";
 import { paramValidator } from "../../middlewares/paramValidator";
 import { createSessionSchema, editSectionSchema, sectionIdValidator, sectionStatusSchema, sessionFilterSchema } from "./section.validator";
 import { bodyValidator } from "../../middlewares/bodyValidator";
@@ -17,7 +17,7 @@ router
     paramValidator(sectionIdValidator),
     bodyValidator(editSectionSchema),
     editSection
-  );
+  ).delete(authMiddleware , checkRole("teacher") , paramValidator(sectionIdValidator) , removeSection)
 
 router
   .route("/:sectionId/sessions")

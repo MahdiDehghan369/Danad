@@ -93,4 +93,5 @@ export const sessionRepo = {
 
     return { sessions, total, page, limit };
   },
+  updateMany: async (condition: object , data: object) => await sessionModel.updateMany(condition , data)
 };
