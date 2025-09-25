@@ -22,7 +22,8 @@ export interface ICourseFilter {
   sortBy?: "cheapest" | "expensive" | "popular" | "all";
   page?: number;
   limit?: number;
-  condition?: object; 
+  condition?: object;
+  status?: "completed" | "pending" | "draft";
 }
 
 export const courseRepo = {
@@ -35,6 +36,8 @@ export const courseRepo = {
     if (filter.isPreSale) query.status = "pending";
     if (filter.categories && filter.categories.length > 0)
       query.category = { $in: filter.categories };
+
+    if(filter.status) query.status = filter.status
 
     if (filter.condition) {
       Object.assign(query, filter.condition);
@@ -81,5 +84,6 @@ export const courseRepo = {
       .findOne({ slug: courseSlug })
       .populate("teacher", "fullname avatar username email")
       .populate("category", "title slug description"),
-  find: async (condition: object) : Promise<ICourse[] | []> => await courseModel.find(condition)
+  find: async (condition: object) : Promise<ICourse[] | []> => await courseModel.find(condition),
+  
 };

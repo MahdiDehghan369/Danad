@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
-import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, getAllSectionsOfCourse, getAllSessionOfCourse, getCourse, getCourses, removeCourse, removeCourseCover } from "./course.ctrl";
+import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, getAllSectionsOfCourse, getAllSessionOfCourse, getCourse, getCourses, getCoursesForAdmin, removeCourse, removeCourseCover } from "./course.ctrl";
 import {uploadPhoto} from "../../middlewares/multer";
 import { bodyValidator } from "../../middlewares/bodyValidator";
-import { courseFilterSchema, courseIdValidator, createCourseSchema, createSectionSchema, statusCourse, teacherIdValidator, updateCourseSchema } from "./course.validator";
+import { courseFilterAdminSchema, courseFilterSchema, courseIdValidator, createCourseSchema, createSectionSchema, statusCourse, teacherIdValidator, updateCourseSchema } from "./course.validator";
 import { paramValidator } from "../../middlewares/paramValidator";
 import { optionalAuthMiddleware } from "../../middlewares/optionalAuthMiddleware";
 import { queryValidator } from "../../middlewares/queryValidator";
@@ -20,6 +20,15 @@ router
     createCourse
   )
   .get(queryValidator(courseFilterSchema), getCourses);
+
+  router
+    .route("/get-courses-admin")
+    .get(
+      authMiddleware,
+      checkRole("admin"),
+      queryValidator(courseFilterAdminSchema),
+      getCoursesForAdmin
+    );
 
 
 router.route("/:courseSlug").get(optionalAuthMiddleware, getCourse);

@@ -143,3 +143,19 @@ export const courseFilterSchema = yup.object({
   page: yup.number().integer().min(1).optional(),
   limit: yup.number().integer().min(1).optional(),
 });
+
+export const courseFilterAdminSchema = yup.object({
+  isFree: yup.boolean().optional(),
+  isPreSale: yup.boolean().optional(),
+  categories: yup.array().of(yup.string()).optional(),
+  sortBy: yup
+    .string()
+    .oneOf(["cheapest", "expensive", "popular", "all"])
+    .optional(),
+  page: yup.number().integer().min(1).optional(),
+  limit: yup.number().integer().min(1).optional(),
+  status: yup
+    .string()
+    .oneOf(["completed", "pending", "draft"])
+    .optional(),
+});

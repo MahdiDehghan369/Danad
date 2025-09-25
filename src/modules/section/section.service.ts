@@ -33,6 +33,14 @@ export const createSessionService = async (
     fileUrl: videoUrl ? `/session-file/${archiveFileUrl}` : null,
   });
 
+  if (section.course) {
+    const course = await courseRepo.findOne({ _id: section.course });
+    if (course) {
+      course.duration += Number(data.videoDuration);
+      await course.save();
+    }
+  }
+
   section.sessions.push(session._id);
   section.save();
 
@@ -112,6 +120,22 @@ export const removeSectionService = async (sectionId: string) => {
 
   if (!section) throw new AppError("Section not found", 404);
 
+  if (section.course) {
+    const course = await courseRepo.findOne({ _id: section.course });
+
+    if (course) {
+      const sessions = await sessionRepo.findAll({ course: section.course });
+
+      const totalDuration = sessions.reduce(
+        (sum, session) => sum + (session.videoDuration || 0),
+        0
+      );
+
+      course.duration -= totalDuration;
+      await course.save();
+    }
+  }
+
   await sessionRepo.updateMany({ section: sectionId }, { section: null });
 
   await sectionRepo.deleteOne({ _id: sectionId });
@@ -132,6 +156,16 @@ export const addSessionToSectionService = async (
 
   section.sessions.push(session._id);
   session.section = section._id;
+
+  if(section.course){
+    
+    const course = await courseRepo.findOne({ _id: section.course });
+
+    if (course) {
+      course.duration += session.videoDuration;
+      await course.save();
+    }
+  }
 
   await Promise.all([section.save(), session.save()]);
 };
@@ -163,13 +197,22 @@ export const removeSessionFromSectionService = async (
     (session) => session.toString() !== sessionId.toString()
   );
 
+    if (section.course) {
+      const course = await courseRepo.findOne({ _id: section.course });
+
+      if (course) {
+        course.duration -= session.videoDuration;
+        await course.save();
+      }
+    }
+
   await section.save();
 };
 
-export const getAllSectionForTeacherService = async (filters: ISecionFilter) => {
+export const getAllSectionForTeacherService = async (
+  filters: ISecionFilter
+) => {
+  const sections = await sectionRepo.findAllSections(filters);
 
-  const sections = await sectionRepo.findAllSections(filters)
-
-  return sections
-
-}
+  return sections;
+};

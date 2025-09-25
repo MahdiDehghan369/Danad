@@ -5,6 +5,7 @@ import { purchasedCourseRepo } from "../purchasedCourse/purchasedCourse.repo";
 import { userRepo } from "../user/user.repo";
 import { ISessionFilter, sessionRepo } from "./session.repo";
 import { sectionRepo } from "../section/section.repo";
+import { courseRepo } from "../course/course.repo";
 
 export const getSessionService = async (sessionId: string) => {
   const session = await sessionRepo.findOne({ _id: sessionId });
@@ -41,6 +42,16 @@ export const removeSessionService = async (sessionId: string) => {
     );
     await section.save();
   }
+
+    if(session.course){
+      
+      const course = await courseRepo.findOne({ _id: session.course });
+  
+      if (course) {
+        course.duration -= session.videoDuration;
+        await course.save();
+      }
+    }
 
   await sessionRepo.deleteOne({ _id: sessionId });
 };

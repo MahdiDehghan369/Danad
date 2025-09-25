@@ -324,3 +324,11 @@ export const getCoursesService = async (filter: ICourseFilter) => {
   return courses
 
 }
+
+export const getCoursesForAdminService = async (filter: ICourseFilter) => {
+
+  const courses = await courseRepo.findAllCourse(filter)
+
+  return courses
+
+}

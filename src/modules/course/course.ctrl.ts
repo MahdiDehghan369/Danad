@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { changeStatusCourseService, changeTeacherCourseService, createCourseService, createSectionService, editCourseService, getAllSectionsOfCourseService, getAllSessionOfCourseServie, getCourseService, getCoursesService, removeCourseCoverService, removeCourseService } from "./course.service";
+import { changeStatusCourseService, changeTeacherCourseService, createCourseService, createSectionService, editCourseService, getAllSectionsOfCourseService, getAllSessionOfCourseServie, getCourseService, getCoursesForAdminService, getCoursesService, removeCourseCoverService, removeCourseService } from "./course.service";
 import { successResponse } from "../../utils/response";
 import fs from "fs";
 import path from "path";
@@ -195,6 +195,18 @@ export const getCourses = async (req: ICustomRequest , res: Response , next: Nex
     const result = await getCoursesService(req.query)
 
     return successResponse(res, 200 , "Get all courses successfully" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getCoursesForAdmin = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const result = await getCoursesForAdminService(req.query)
+
+    return successResponse(res, 200 , "Get courses successfully" , result)
     
   } catch (error) {
     next(error)
