@@ -1,26 +1,33 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
-import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, getAllSectionsOfCourse, getAllSessionOfCourse, removeCourse, removeCourseCover } from "./course.ctrl";
+import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, getAllSectionsOfCourse, getAllSessionOfCourse, getCourse, getCourses, removeCourse, removeCourseCover } from "./course.ctrl";
 import {uploadPhoto} from "../../middlewares/multer";
 import { bodyValidator } from "../../middlewares/bodyValidator";
-import { courseIdValidator, createCourseSchema, createSectionSchema, statusCourse, teacherIdValidator, updateCourseSchema } from "./course.validator";
+import { courseFilterSchema, courseIdValidator, createCourseSchema, createSectionSchema, statusCourse, teacherIdValidator, updateCourseSchema } from "./course.validator";
 import { paramValidator } from "../../middlewares/paramValidator";
+import { optionalAuthMiddleware } from "../../middlewares/optionalAuthMiddleware";
+import { queryValidator } from "../../middlewares/queryValidator";
 const router = Router()
 
-router.route("/").post(
-  authMiddleware,
-  checkRole("admin"),
-  uploadPhoto.single("cover"),
-  bodyValidator(createCourseSchema),
-  createCourse
-);
+router
+  .route("/")
+  .post(
+    authMiddleware,
+    checkRole("admin"),
+    uploadPhoto.single("cover"),
+    bodyValidator(createCourseSchema),
+    createCourse
+  )
+  .get(queryValidator(courseFilterSchema), getCourses);
+
+
+router.route("/:courseSlug").get(optionalAuthMiddleware, getCourse);
 
 router
   .route("/:courseId/sections")
   .get(
-    authMiddleware,
-    paramValidator(courseIdValidator),
+    optionalAuthMiddleware,
     getAllSectionsOfCourse
   );
 

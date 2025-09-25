@@ -8,7 +8,7 @@ export interface ICustomRequest extends Request {
     user?: IUser
 }
 
-interface IJwt {
+export interface IJwt {
     userId: string
 }
 

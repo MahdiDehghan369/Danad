@@ -3,13 +3,17 @@ import { AppError } from "../../utils/appError";
 import { slugify } from "../../utils/slugify";
 import { categoryRepo } from "../category/category.repo";
 import { userRepo } from "../user/user.repo";
-import { courseRepo, ICreateCourseData } from "./course.repo";
+import { courseRepo, ICourseFilter, ICreateCourseData } from "./course.repo";
 import fs from "fs";
 import { ICourse } from "./course.model";
 import mongoose from "mongoose";
 import { banRepo } from "../ban/ban.repo";
 import { ICreateSection, sectionRepo } from "../section/section.repo";
 import { sessionRepo } from "../session/session.repo";
+import { courseDiscountRepo } from "../discount/discount.repo";
+import { calcDiscountedPrice } from "../../utils/calcDiscountedPrice";
+import { purchasedCourseRepo } from "../purchasedCourse/purchasedCourse.repo";
+import { commentRepo } from "../comment/comment.repo";
 
 type statusCourse = "completed" | "pending" | "draft";
 
@@ -195,7 +199,10 @@ export const getAllSessionOfCourseServie = async (courseId: string) => {
     course: courseId,
     status: "published",
   });
-  const sessions = await sessionRepo.findAll({course: courseId , status: "published"});
+  const sessions = await sessionRepo.findAll({
+    course: courseId,
+    status: "published",
+  });
 
   const result = sections.map((section: any) => {
     const sectionSessions = sessions
@@ -211,13 +218,14 @@ export const getAllSessionOfCourseServie = async (courseId: string) => {
   return result;
 };
 
-export const getAllSectionsOfCourseService = async (courseId: string) => {
-  const course = await courseRepo.findOne({ _id: courseId });
+export const getAllSectionsOfCourseService = async (courseSlug: string) => {
+  courseSlug = slugify(courseSlug);
+  const course = await courseRepo.findBySlug(courseSlug);
 
   if (!course) throw new AppError("Course not found", 404);
 
   const sections = await sectionRepo.findAll({
-    course: courseId,
+    course: course._id.toString(),
     status: "published",
   });
 
@@ -230,7 +238,7 @@ export const getAllSectionsOfCourseService = async (courseId: string) => {
       );
 
       return {
-        ...(section.toObject?.() ?? section), 
+        ...(section.toObject?.() ?? section),
         sessions: sessions.filter((s) => s !== null),
       };
     })
@@ -238,3 +246,81 @@ export const getAllSectionsOfCourseService = async (courseId: string) => {
 
   return { sections: newSections };
 };
+
+export const getCourseService = async (courseSlug: string, userId?: string) => {
+  courseSlug = slugify(courseSlug);
+  const course = await courseRepo.findBySlug(courseSlug);
+
+  if (!course) throw new AppError("Course not found", 404);
+
+  const discounts = await courseDiscountRepo.find({ isActive: true });
+  const now = new Date();
+
+  const globalDiscount = discounts.discounts.find(
+    (d) =>
+      d.scope === "all" &&
+      (!d.startAt || d.startAt <= now) &&
+      (!d.endAt || d.endAt >= now)
+  );
+
+  const courseDiscount = discounts.discounts.find(
+    (discount) =>
+      discount.scope === "single" &&
+      String(discount.course) === String(course._id) &&
+      (!discount.startAt || discount.startAt <= now) &&
+      (!discount.endAt || discount.endAt >= now)
+  );
+
+  const applied = courseDiscount || globalDiscount;
+  const discountedPrice = calcDiscountedPrice(course.price, applied);
+
+  const studentsEnrolled = await purchasedCourseRepo.find({
+    course: course._id,
+  });
+
+  let userBoughtCourse = null
+
+  if (userId) {
+    const user = await userRepo.findById(userId);
+    if(user){
+      userBoughtCourse = await purchasedCourseRepo.findOne({user: userId , course: course._id})    
+    }
+  }
+
+  const comments = await commentRepo.findTreeByCourse(
+    course._id.toString(),
+    "approved"
+  );
+
+  const newCourse = {
+    _id: course._id,
+    title: course.title,
+    description: course.description,
+    slug: course.slug,
+    price: course.price,
+    finalPrie: discountedPrice,
+    disount: applied,
+    cover: course.cover,
+    category: course.category,
+    language: course.language,
+    studentsEnrolled: studentsEnrolled.length,
+    teacher: course.teacher,
+    prerequisites: course.prerequisites,
+    userBoughtIt: Boolean(userBoughtCourse),
+    rating: course.rating,
+    createdAt: course.createdAt,
+    updatedAt: course.updatedAt,
+    comments
+  };
+
+  return { course: newCourse };
+};
+
+export const getCoursesService = async (filter: ICourseFilter) => {
+
+  filter.condition = { status: { $ne: "draft" } };
+  const courses = await courseRepo.findAllCourse(filter);
+
+  return courses
+
+}

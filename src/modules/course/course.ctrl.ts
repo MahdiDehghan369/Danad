@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { changeStatusCourseService, changeTeacherCourseService, createCourseService, createSectionService, editCourseService, getAllSectionsOfCourseService, getAllSessionOfCourseServie, removeCourseCoverService, removeCourseService } from "./course.service";
+import { changeStatusCourseService, changeTeacherCourseService, createCourseService, createSectionService, editCourseService, getAllSectionsOfCourseService, getAllSessionOfCourseServie, getCourseService, getCoursesService, removeCourseCoverService, removeCourseService } from "./course.service";
 import { successResponse } from "../../utils/response";
 import fs from "fs";
 import path from "path";
@@ -168,6 +168,33 @@ export const getAllSectionsOfCourse = async (req: ICustomRequest , res: Response
     const result = await getAllSectionsOfCourseService(courseId)
 
     return successResponse(res, 200, "Get all sections successfully" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getCourse = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const courseSlug = req.params.courseSlug
+    const userId = req.user?._id as string | undefined
+
+    const result = await getCourseService(courseSlug , userId)
+
+    return successResponse(res, 200 , "Get course successfully" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getCourses = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const result = await getCoursesService(req.query)
+
+    return successResponse(res, 200 , "Get all courses successfully" , result)
     
   } catch (error) {
     next(error)
