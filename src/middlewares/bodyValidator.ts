@@ -10,7 +10,7 @@ export const bodyValidator = (validator: AnySchema) => {
       await validator.validate(req.body);
       next();
     } catch (error : any) {
-        if (req.file?.filename) {
+        if (req.file?.fieldname === "cover") {
           fs.unlinkSync(
             path.join(
               __dirname,
@@ -21,6 +21,17 @@ export const bodyValidator = (validator: AnySchema) => {
               req.file.filename
             )
           );
+        } else if(req.file?.fieldname === "article-cover"){
+           fs.unlinkSync(
+             path.join(
+               __dirname,
+               "..",
+               "..",
+               "public",
+               "article-cover",
+               req.file.filename
+             )
+           );
         }
       throw new AppError(error.errors , 400)
     }

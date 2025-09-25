@@ -21,8 +21,14 @@ const destinationCourseSessionFile = path.join(
   "session-file"
 );
 
+const destinationArticleCover = path.join(pathPublicFolder, "article-cover");
+
 if (!fs.existsSync(destinationProfile)) {
   fs.mkdirSync(destinationProfile);
+}
+
+if (!fs.existsSync(destinationArticleCover)) {
+  fs.mkdirSync(destinationArticleCover);
 }
 
 if (!fs.existsSync(destinationCourseCover)) {
@@ -45,6 +51,8 @@ const multerStorage = multer.diskStorage({
       cb(null, destinationCourseSessionFile);
     else if (file.fieldname === "session-video")
       cb(null, destinationCourseSessionVideo);
+    else if (file.fieldname === "article-cover")
+      cb(null, destinationArticleCover);
   },
   filename: function (req, file, cb) {
     const ext = path.extname(file.originalname);
@@ -106,6 +114,7 @@ export const uploadPhoto = multer({
   fileFilter: multerFilter as any,
   limits: { fileSize: 2 * 1024 * 1024 },
 });
+
 
 // export const uploadSessionVideo = multer({
 //   storage: multerStorage,
