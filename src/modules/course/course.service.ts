@@ -379,3 +379,19 @@ export const getCoursesForAdminService = async (filter: ICourseFilter) => {
   return courses
 
 }
+
+export const getCategoryCoursesService = async (categorySlug: string ,filter: ICourseFilter) => {
+
+  categorySlug = slugify(categorySlug)
+  const category = await categoryRepo.findOneBySlug(categorySlug , "course")
+
+  if(!category) throw new AppError("Category not found" , 404)
+
+  filter.condition = { status: { $ne: "draft" } };
+
+  filter.categories = [category._id.toString()]
+
+  const courses = await courseRepo.findAllCourse(filter);
+
+  return courses;
+};

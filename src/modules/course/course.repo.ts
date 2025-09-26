@@ -16,6 +16,7 @@ export interface ICreateCourseData {
 }
 
 export interface ICourseFilter {
+  search?: string;
   isFree?: boolean;
   isPreSale?: boolean;
   categories?: string[];
@@ -26,18 +27,28 @@ export interface ICourseFilter {
   status?: "completed" | "pending" | "draft";
 }
 
+
+
 export const courseRepo = {
   create: async (data: ICreateCourseData): Promise<ICourse> =>
     await courseModel.create(data),
   findAllCourse: async (filter: ICourseFilter = {}) => {
     const query: any = {};
 
+        if (filter.search) {
+          query.$or = [
+            { title: { $regex: filter.search, $options: "i" } },
+            { description: { $regex: filter.search, $options: "i" } },
+            { slug: { $regex: filter.search, $options: "i" } },
+          ];
+        }
+
     if (filter.isFree) query.price = 0;
     if (filter.isPreSale) query.status = "pending";
     if (filter.categories && filter.categories.length > 0)
       query.category = { $in: filter.categories };
 
-    if(filter.status) query.status = filter.status
+    if (filter.status) query.status = filter.status;
 
     if (filter.condition) {
       Object.assign(query, filter.condition);
@@ -84,6 +95,6 @@ export const courseRepo = {
       .findOne({ slug: courseSlug })
       .populate("teacher", "fullname avatar username email")
       .populate("category", "title slug description"),
-  find: async (condition: object) : Promise<ICourse[] | []> => await courseModel.find(condition),
-  
+  find: async (condition: object): Promise<ICourse[] | []> =>
+    await courseModel.find(condition),
 };

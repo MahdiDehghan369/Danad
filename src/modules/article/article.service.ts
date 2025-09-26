@@ -236,6 +236,8 @@ export const getArticlesCategoryService = async (
 
   filters.status = "published"
 
+  filters.categories = [category._id.toString()]
+
   const articles = await articleRepo.findAllArticles(filters);
 
   return articles

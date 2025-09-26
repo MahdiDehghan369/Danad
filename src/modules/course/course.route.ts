@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authMiddleware } from "../../middlewares/auth";
 import { checkRole } from "../../middlewares/checkRole";
-import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, getAllSectionsOfCourse, getAllSessionOfCourse, getCourse, getCourses, getCoursesForAdmin, removeCourse, removeCourseCover } from "./course.ctrl";
+import { changeStatusCourse, changeTeacherCourse, createCourse, createSection, editCourse, getAllSectionsOfCourse, getAllSessionOfCourse, getCategoryCourses, getCourse, getCourses, getCoursesForAdmin, removeCourse, removeCourseCover } from "./course.ctrl";
 import {uploadPhoto} from "../../middlewares/multer";
 import { bodyValidator } from "../../middlewares/bodyValidator";
 import { courseFilterAdminSchema, courseFilterSchema, courseIdValidator, createCourseSchema, createSectionSchema, statusCourse, teacherIdValidator, updateCourseSchema } from "./course.validator";
@@ -29,6 +29,8 @@ router
       queryValidator(courseFilterAdminSchema),
       getCoursesForAdmin
     );
+
+router.route("/category/:categorySlug").get(queryValidator(courseFilterSchema) ,getCategoryCourses);
 
 
 router.route("/:courseSlug").get(optionalAuthMiddleware, getCourse);
