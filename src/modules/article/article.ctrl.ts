@@ -1,6 +1,6 @@
 import { NextFunction, Response } from "express";
 import { ICustomRequest } from "../../middlewares/auth";
-import { changeStatusArticleService, createArticleService, editArticleService, getAllArticlesForAdminService, getAllArticlesService, getArticleService, getRelatedArticlesService, removeArticleCoverService, removeArticleService, uploadArticleCoverService } from "./article.service";
+import { changeStatusArticleService, createArticleService, editArticleService, getAllArticlesForAdminService, getAllArticlesService, getArticlesCategoryService, getArticleService, getRelatedArticlesService, removeArticleCoverService, removeArticleService, uploadArticleCoverService } from "./article.service";
 import { successResponse } from "../../utils/response";
 import fs, { stat } from "fs";
 import path from "path";
@@ -179,6 +179,20 @@ export const getRelatedArticles = async (req: ICustomRequest , res: Response , n
     const limit = req.body?.limit
 
     const result = await getRelatedArticlesService(artileId , limit)
+
+    return successResponse(res, 200 , "Get successfully" , result)
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getArticlesCategory = async (req: ICustomRequest , res: Response , next: NextFunction) => {
+  try {
+
+    const categorySlug = req.params.categorySlug
+
+    const result = await getArticlesCategoryService(categorySlug , req.query)
 
     return successResponse(res, 200 , "Get successfully" , result)
     

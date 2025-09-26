@@ -223,3 +223,20 @@ export const getRelatedArticlesService = async (
 
   return {Articles : related};
 };
+
+export const getArticlesCategoryService = async (
+  categorySlug: string,
+  filters: IArticleFilter
+) => {
+  categorySlug = slugify(categorySlug);
+
+  const category = await categoryRepo.findOneBySlug(categorySlug, "blog");
+
+  if (!category) throw new AppError("Category not found", 404);
+
+  filters.status = "published"
+
+  const articles = await articleRepo.findAllArticles(filters);
+
+  return articles
+};

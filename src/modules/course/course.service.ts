@@ -105,8 +105,55 @@ export const removeCourseService = async (courseId: string) => {
 
     if (fs.existsSync(coverPath)) fs.unlinkSync(coverPath);
   }
-
   await courseRepo.deleteOne({ _id: courseId });
+
+  await sectionRepo.deleteMany({course: courseId})
+
+  const sessions = await sessionRepo.findAll({course: courseId})
+
+await Promise.all(
+  sessions.map(async (session) => {
+    if (session.fileUrl) {
+      const filePath = path.join(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "public",
+        session.fileUrl
+      );
+      try {
+        await fs.promises.unlink(filePath).catch(() => {});
+      } catch (err: any) {
+        if (err.code !== "ENOENT") {
+          throw new AppError(`Error deleting file ${filePath}: ${err}`  , 500);
+        }
+      }
+    }
+
+    if (session.videoUrl) {
+      const videoPath = path.join(
+        __dirname,
+        "..",
+        "..",
+        "..",
+        "public",
+        session.videoUrl
+      );
+      try {
+        await fs.promises.unlink(videoPath).catch(() => {});
+      } catch (err: any) {
+        if (err.code !== "ENOENT") {
+          throw new AppError(`Error deleting video ${videoPath}: ${err}`, 500);
+        }
+      }
+    }
+
+    await sessionRepo.deleteOne({ _id: session._id });
+  })
+);
+
+
 };
 
 export const changeStatusCourseService = async (

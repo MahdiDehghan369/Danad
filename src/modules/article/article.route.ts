@@ -9,6 +9,7 @@ import {
   getAllArticles,
   getAllArticlesForAdmin,
   getArticle,
+  getArticlesCategory,
   getRelatedArticles,
   removeArticle,
   removeArticleCover,
@@ -55,6 +56,8 @@ router
       bodyValidator(articleLimitSchema),
       getRelatedArticles
     );
+
+  router.route("/category/:categorySlug").get(queryValidator(articleFilterSchema) , getArticlesCategory);
 
 router
   .route("/:articleId")

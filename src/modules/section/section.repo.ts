@@ -65,4 +65,5 @@ export const sectionRepo = {
 
     return { sessions, total, page, limit };
   },
+  deleteMany : async(condition: object) => await sectionModel.deleteMany(condition)
 };
