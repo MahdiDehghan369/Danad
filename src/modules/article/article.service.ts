@@ -3,7 +3,7 @@ import { AppError } from "../../utils/appError";
 import { slugify } from "../../utils/slugify";
 import { categoryRepo } from "../category/category.repo";
 import { courseRepo } from "../course/course.repo";
-import { articleRepo, ICreateArticle, IEditArticle } from "./article.repo";
+import { articleRepo, IArticleFilter, ICreateArticle, IEditArticle } from "./article.repo";
 import fs from "fs";
 
 export const createArticleService = async (data: ICreateArticle) => {
@@ -149,4 +149,77 @@ export const changeStatusArticleService = async (
   );
 
   return { article: updatedArticle };
+};
+
+export const removeArticleCoverService = async (articleId: string) => {
+
+  const article = await articleRepo.findOne({_id: articleId})
+
+  if(!article) throw new AppError("Article not found" , 404)
+
+  if(!article.cover) throw new AppError("Article don'y have any cover" , 404)
+
+  const coverPath = path.join(__dirname , ".." , ".." , ".." , "public" , article.cover)
+
+  if(fs.existsSync(coverPath)){
+    fs.unlinkSync(coverPath)
+  }
+
+  article.cover = null
+
+  await article.save()
+
+}
+
+export const uploadArticleCoverService = async (articleId: string , cover: string) => {
+
+  const article = await articleRepo.findOne({_id: articleId})
+
+  if(!article) throw new AppError("Article not found" , 404)
+
+  if(article.cover){
+    const oldCoverPath = path.join(__dirname, ".." , ".." , ".." , "public" , article.cover)
+    if(fs.existsSync(oldCoverPath)) fs.unlinkSync(oldCoverPath)
+  }
+
+  const newCoverPath = `/article-cover/${cover}`
+
+  article.cover = newCoverPath
+  await article.save()
+
+  return {articleCover: newCoverPath}
+
+}
+
+export const  getAllArticlesService = async (filters: IArticleFilter) => {
+
+  filters.condition = {status: "published"}
+
+  const articles = await articleRepo.findAllArticles(filters)
+
+  return articles
+}
+
+export const getAllArticlesForAdminService = async (filters: IArticleFilter) => {
+  const articles = await articleRepo.findAllArticles(filters);
+
+  return articles;
+};
+
+export const getRelatedArticlesService = async (
+  articleId: string,
+  limit: number = 4
+) => {
+  const article = await articleRepo.findOne({ _id: articleId });
+  if (!article) throw new AppError("Article not found", 404);
+
+  const query: any = {
+    _id: { $ne: article._id },
+    status: "published",
+    category: { $in: article.category },
+  };
+
+  const related = await articleRepo.findRelatedArticles(query, limit);
+
+  return {Articles : related};
 };

@@ -9,7 +9,7 @@ export interface IArticle extends Document {
   slug: string;
   shortDescription?: string;
   content: string;
-  cover: string;
+  cover: string | null;
   author: Types.ObjectId;
   relatedCourses?: string[];
   category: Types.ObjectId;
@@ -26,7 +26,7 @@ const ArticleSchema = new Schema(
     slug: { type: String, required: true, unique: true, index: true },
     shortDescription: { type: String },
     content: { type: String, required: true },
-    cover: { type: String, required: true },
+    cover: { type: String},
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
     relatedCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
     category: { type: Schema.Types.ObjectId, ref: "Category" },

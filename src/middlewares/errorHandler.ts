@@ -15,5 +15,5 @@ export const errorHandler = (
     return errorResponse(res, err.statusCode, err.message);
   }
 
-  return errorResponse(res, 500, "Server Error");
+  return errorResponse(res, 500, err);
 };

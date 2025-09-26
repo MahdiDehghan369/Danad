@@ -82,3 +82,26 @@ export const articleStatusSchema = yup.object().shape({
     .oneOf(["draft", "published"], "Status must be draft or published")
     .required("Status is required"),
 });
+
+
+export const articleFilterSchema = yup.object({
+  sortBy: yup
+    .mixed<"newest" | "oldest" | "popular" | "all">()
+    .oneOf(["newest", "oldest", "popular", "all"])
+    .optional(),
+
+  page: yup.number().min(1).optional(),
+
+  limit: yup.number().min(1).optional(),
+
+  status: yup
+    .mixed<"published" | "draft">()
+    .oneOf(["published", "draft"])
+    .optional(),
+
+  categories: yup.array(yup.string()).optional(),
+});
+
+export const articleLimitSchema = yup.object({
+  limit: yup.number().min(1).optional(),
+});
